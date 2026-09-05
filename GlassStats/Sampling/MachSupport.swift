@@ -51,7 +51,7 @@ struct CPUTicks: Equatable {
     static func fromLoadInfo(_ info: host_cpu_load_info) -> CPUTicks {
         withUnsafeBytes(of: info.cpu_ticks) { raw in
             let ticks = raw.bindMemory(to: natural_t.self)
-            CPUTicks(
+            return CPUTicks(
                 user: UInt64(ticks[0]),
                 system: UInt64(ticks[1]),
                 idle: UInt64(ticks[2]),

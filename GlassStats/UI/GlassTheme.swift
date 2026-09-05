@@ -45,7 +45,7 @@ private struct LiquidGlassBackground<S: Shape>: ViewModifier {
         content
             .background(.ultraThinMaterial, in: shape)
             .overlay {
-                shape.strokeBorder(
+                shape.stroke(
                     LinearGradient(
                         colors: [
                             Color.white.opacity(0.38),
