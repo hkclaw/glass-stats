@@ -49,15 +49,13 @@ struct CPUTicks: Equatable {
     }
 
     static func fromLoadInfo(_ info: host_cpu_load_info) -> CPUTicks {
-        withUnsafeBytes(of: info.cpu_ticks) { raw in
-            let ticks = raw.bindMemory(to: natural_t.self)
-            return CPUTicks(
-                user: UInt64(ticks[0]),
-                system: UInt64(ticks[1]),
-                idle: UInt64(ticks[2]),
-                nice: UInt64(ticks[3])
-            )
-        }
+        // cpu_ticks is a fixed (user, system, idle, nice) tuple — use CPU_STATE_* order.
+        CPUTicks(
+            user: UInt64(info.cpu_ticks.0),
+            system: UInt64(info.cpu_ticks.1),
+            idle: UInt64(info.cpu_ticks.2),
+            nice: UInt64(info.cpu_ticks.3)
+        )
     }
 }
 

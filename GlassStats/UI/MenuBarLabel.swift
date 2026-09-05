@@ -24,6 +24,8 @@ struct MenuBarLabel: View {
         }
         .font(.system(size: 11, weight: .semibold, design: .rounded))
         .monospacedDigit()
+        // MenuBarExtra labels can stick on some macOS builds without an identity bump.
+        .id(store.snapshot.timestamp)
         .accessibilityLabel(accessibility)
     }
 
