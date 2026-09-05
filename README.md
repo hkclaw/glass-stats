@@ -31,6 +31,10 @@ Intel Macs are out of scope for V1 (`ARCHS = arm64`).
 5. Click the status item for the popover (charts, top processes, disk / network / battery). Open **Settings** from the gear, or **Glass Stats → Settings…** once the app is frontmost.
 6. Quit from the popover power button, or **Activity Monitor**.
 
+**macOS 26 Tahoe:** if the status item does not appear, open **System Settings → Desktop & Dock → Menu Bar** (wording may vary) and allow **Glass Stats** to show in the menu bar. Some Tahoe builds hide new extras until they are enabled there.
+
+Sampling defaults to **1 second** (Settings: 0.5 / 1 / 2 s) so the menu bar extra stays cheap. GPU / fans / SMC sensors are not sampled in V1.
+
 Optional: if you use [XcodeGen](https://github.com/yonaskolb/XcodeGen), `project.yml` can regenerate the project (`xcodegen generate`). A checked-in `.xcodeproj` is already present so you do not need XcodeGen to build.
 
 **Deployment target:** macOS 14.0. **Bundle ID:** `com.hkclaw.GlassStats`. **Version:** 0.1.0.
