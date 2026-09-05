@@ -31,9 +31,9 @@ Intel Macs are out of scope for V1 (`ARCHS = arm64`).
 5. Click the status item for the popover (charts, top processes, disk / network / battery). Open **Settings** from the gear, or **Glass Stats → Settings…** once the app is frontmost.
 6. Quit from the popover power button, or **Activity Monitor**.
 
-**macOS 26 Tahoe:** if the status item does not appear, open **System Settings → Desktop & Dock → Menu Bar** (wording may vary) and allow **Glass Stats** to show in the menu bar. Some Tahoe builds hide new extras until they are enabled there.
+**macOS Tahoe** may need **System Settings → Menu Bar** to allow the app icon. If the status item does not appear, open that pane (sometimes under Desktop & Dock) and enable **Glass Stats**.
 
-Sampling defaults to **1 second** (Settings: 0.5 / 1 / 2 s) so the menu bar extra stays cheap. GPU / fans / SMC sensors are not sampled in V1.
+Sampling defaults to **1 second** (Settings: 1 / 2 / 5 s) so the extra does not burn battery. GPU / fans / sensors are V1.1 only — this app does not call private SMC APIs.
 
 Optional: if you use [XcodeGen](https://github.com/yonaskolb/XcodeGen), `project.yml` can regenerate the project (`xcodegen generate`). A checked-in `.xcodeproj` is already present so you do not need XcodeGen to build.
 
@@ -64,7 +64,7 @@ Compare CPU and Memory Used with **Activity Monitor** after a second or two of s
 ## Project layout
 
 ```
-GlassStats.xcodeproj/     Xcode 16 folder-synced project (opens cleanly)
+GlassStats.xcodeproj/     Checked-in Xcode project (explicit file list; opens in Xcode 16+)
 project.yml               Optional XcodeGen spec
 GlassStats/
   GlassStatsApp.swift     MenuBarExtra (window) + Settings scene

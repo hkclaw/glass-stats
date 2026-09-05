@@ -3,40 +3,68 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 77;
+	objectVersion = 56;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		8F1A00000000000000000258 /* GlassStatsApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8F1A00000000000000000064 /* GlassStatsApp.swift */; };
+		8F1A00000000000000000259 /* ModuleSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8F1A00000000000000000065 /* ModuleSettings.swift */; };
+		8F1A0000000000000000025A /* MonitorStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8F1A00000000000000000066 /* MonitorStore.swift */; };
+		8F1A0000000000000000025B /* SystemSnapshot.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8F1A00000000000000000067 /* SystemSnapshot.swift */; };
+		8F1A0000000000000000025C /* MachSupport.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8F1A00000000000000000068 /* MachSupport.swift */; };
+		8F1A0000000000000000025D /* HostCPU.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8F1A00000000000000000069 /* HostCPU.swift */; };
+		8F1A0000000000000000025E /* HostMemory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8F1A0000000000000000006A /* HostMemory.swift */; };
+		8F1A0000000000000000025F /* HostProcesses.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8F1A0000000000000000006B /* HostProcesses.swift */; };
+		8F1A00000000000000000260 /* HostDisk.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8F1A0000000000000000006C /* HostDisk.swift */; };
+		8F1A00000000000000000261 /* HostNetwork.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8F1A0000000000000000006D /* HostNetwork.swift */; };
+		8F1A00000000000000000262 /* HostBattery.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8F1A0000000000000000006E /* HostBattery.swift */; };
+		8F1A00000000000000000263 /* SystemSampler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8F1A0000000000000000006F /* SystemSampler.swift */; };
+		8F1A00000000000000000264 /* GlassTheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8F1A00000000000000000070 /* GlassTheme.swift */; };
+		8F1A00000000000000000265 /* MenuBarLabel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8F1A00000000000000000071 /* MenuBarLabel.swift */; };
+		8F1A00000000000000000266 /* PopoverRootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8F1A00000000000000000072 /* PopoverRootView.swift */; };
+		8F1A00000000000000000267 /* UsageChart.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8F1A00000000000000000073 /* UsageChart.swift */; };
+		8F1A00000000000000000268 /* CPUModuleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8F1A00000000000000000074 /* CPUModuleView.swift */; };
+		8F1A00000000000000000269 /* MemoryModuleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8F1A00000000000000000075 /* MemoryModuleView.swift */; };
+		8F1A0000000000000000026A /* TopProcessesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8F1A00000000000000000076 /* TopProcessesView.swift */; };
+		8F1A0000000000000000026B /* DiskModuleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8F1A00000000000000000077 /* DiskModuleView.swift */; };
+		8F1A0000000000000000026C /* NetworkModuleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8F1A00000000000000000078 /* NetworkModuleView.swift */; };
+		8F1A0000000000000000026D /* BatteryModuleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8F1A00000000000000000079 /* BatteryModuleView.swift */; };
+		8F1A0000000000000000026E /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8F1A0000000000000000007A /* SettingsView.swift */; };
+		8F1A00000000000000000017 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 8F1A00000000000000000016 /* Assets.xcassets */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXFileReference section */
-		A10000000000000000000001 /* Glass Stats.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Glass Stats.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		8F1A00000000000000000003 /* Glass Stats.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Glass Stats.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		8F1A00000000000000000064 /* GlassStatsApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GlassStatsApp.swift; sourceTree = "<group>"; };
+		8F1A00000000000000000065 /* ModuleSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModuleSettings.swift; sourceTree = "<group>"; };
+		8F1A00000000000000000066 /* MonitorStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MonitorStore.swift; sourceTree = "<group>"; };
+		8F1A00000000000000000067 /* SystemSnapshot.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SystemSnapshot.swift; sourceTree = "<group>"; };
+		8F1A00000000000000000068 /* MachSupport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MachSupport.swift; sourceTree = "<group>"; };
+		8F1A00000000000000000069 /* HostCPU.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HostCPU.swift; sourceTree = "<group>"; };
+		8F1A0000000000000000006A /* HostMemory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HostMemory.swift; sourceTree = "<group>"; };
+		8F1A0000000000000000006B /* HostProcesses.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HostProcesses.swift; sourceTree = "<group>"; };
+		8F1A0000000000000000006C /* HostDisk.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HostDisk.swift; sourceTree = "<group>"; };
+		8F1A0000000000000000006D /* HostNetwork.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HostNetwork.swift; sourceTree = "<group>"; };
+		8F1A0000000000000000006E /* HostBattery.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HostBattery.swift; sourceTree = "<group>"; };
+		8F1A0000000000000000006F /* SystemSampler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SystemSampler.swift; sourceTree = "<group>"; };
+		8F1A00000000000000000070 /* GlassTheme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GlassTheme.swift; sourceTree = "<group>"; };
+		8F1A00000000000000000071 /* MenuBarLabel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuBarLabel.swift; sourceTree = "<group>"; };
+		8F1A00000000000000000072 /* PopoverRootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PopoverRootView.swift; sourceTree = "<group>"; };
+		8F1A00000000000000000073 /* UsageChart.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UsageChart.swift; sourceTree = "<group>"; };
+		8F1A00000000000000000074 /* CPUModuleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CPUModuleView.swift; sourceTree = "<group>"; };
+		8F1A00000000000000000075 /* MemoryModuleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MemoryModuleView.swift; sourceTree = "<group>"; };
+		8F1A00000000000000000076 /* TopProcessesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TopProcessesView.swift; sourceTree = "<group>"; };
+		8F1A00000000000000000077 /* DiskModuleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiskModuleView.swift; sourceTree = "<group>"; };
+		8F1A00000000000000000078 /* NetworkModuleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkModuleView.swift; sourceTree = "<group>"; };
+		8F1A00000000000000000079 /* BatteryModuleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BatteryModuleView.swift; sourceTree = "<group>"; };
+		8F1A0000000000000000007A /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		8F1A00000000000000000016 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		8F1A00000000000000000018 /* GlassStats.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = GlassStats.entitlements; sourceTree = "<group>"; };
+		8F1A00000000000000000019 /* GlassStats-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "GlassStats-Bridging-Header.h"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
-/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
-		A10000000000000000000002 /* Exceptions for "GlassStats" folder in "GlassStats" target */ = {
-			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
-			membershipExceptions = (
-				GlassStats.entitlements,
-			);
-			target = A10000000000000000000010 /* GlassStats */;
-		};
-/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
-
-/* Begin PBXFileSystemSynchronizedRootGroup section */
-		A10000000000000000000003 /* GlassStats */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			exceptions = (
-				A10000000000000000000002 /* Exceptions for "GlassStats" folder in "GlassStats" target */,
-			);
-			explicitFileTypes = {
-			};
-			explicitFolders = (
-			);
-			path = GlassStats;
-			sourceTree = "<group>";
-		};
-/* End PBXFileSystemSynchronizedRootGroup section */
-
 /* Begin PBXFrameworksBuildPhase section */
-		A10000000000000000000004 /* Frameworks */ = {
+		8F1A0000000000000000000E /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -46,143 +74,221 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		A10000000000000000000005 = {
+		8F1A00000000000000000004 = {
 			isa = PBXGroup;
 			children = (
-				A10000000000000000000003 /* GlassStats */,
-				A10000000000000000000006 /* Products */,
+				8F1A00000000000000000006 /* GlassStats */,
+				8F1A0000000000000000001A /* Frameworks */,
+				8F1A00000000000000000005 /* Products */,
 			);
 			sourceTree = "<group>";
 		};
-		A10000000000000000000006 /* Products */ = {
+		8F1A00000000000000000005 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				A10000000000000000000001 /* Glass Stats.app */,
+				8F1A00000000000000000003 /* Glass Stats.app */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		8F1A0000000000000000001A /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		8F1A00000000000000000006 /* GlassStats */ = {
+			isa = PBXGroup;
+			children = (
+				8F1A00000000000000000007 /* App */,
+				8F1A00000000000000000008 /* Models */,
+				8F1A00000000000000000009 /* Sampling */,
+				8F1A0000000000000000000A /* UI */,
+				8F1A00000000000000000064 /* GlassStatsApp.swift */,
+				8F1A00000000000000000016 /* Assets.xcassets */,
+				8F1A00000000000000000018 /* GlassStats.entitlements */,
+				8F1A00000000000000000019 /* GlassStats-Bridging-Header.h */,
+			);
+			path = GlassStats;
+			sourceTree = "<group>";
+		};
+		8F1A00000000000000000007 /* App */ = {
+			isa = PBXGroup;
+			children = (
+				8F1A00000000000000000065 /* ModuleSettings.swift */,
+				8F1A00000000000000000066 /* MonitorStore.swift */,
+			);
+			path = App;
+			sourceTree = "<group>";
+		};
+		8F1A00000000000000000008 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				8F1A00000000000000000067 /* SystemSnapshot.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		8F1A00000000000000000009 /* Sampling */ = {
+			isa = PBXGroup;
+			children = (
+				8F1A00000000000000000068 /* MachSupport.swift */,
+				8F1A00000000000000000069 /* HostCPU.swift */,
+				8F1A0000000000000000006A /* HostMemory.swift */,
+				8F1A0000000000000000006B /* HostProcesses.swift */,
+				8F1A0000000000000000006C /* HostDisk.swift */,
+				8F1A0000000000000000006D /* HostNetwork.swift */,
+				8F1A0000000000000000006E /* HostBattery.swift */,
+				8F1A0000000000000000006F /* SystemSampler.swift */,
+			);
+			path = Sampling;
+			sourceTree = "<group>";
+		};
+		8F1A0000000000000000000A /* UI */ = {
+			isa = PBXGroup;
+			children = (
+				8F1A0000000000000000000B /* Modules */,
+				8F1A0000000000000000000C /* Settings */,
+				8F1A00000000000000000070 /* GlassTheme.swift */,
+				8F1A00000000000000000071 /* MenuBarLabel.swift */,
+				8F1A00000000000000000072 /* PopoverRootView.swift */,
+				8F1A00000000000000000073 /* UsageChart.swift */,
+			);
+			path = UI;
+			sourceTree = "<group>";
+		};
+		8F1A0000000000000000000B /* Modules */ = {
+			isa = PBXGroup;
+			children = (
+				8F1A00000000000000000074 /* CPUModuleView.swift */,
+				8F1A00000000000000000075 /* MemoryModuleView.swift */,
+				8F1A00000000000000000076 /* TopProcessesView.swift */,
+				8F1A00000000000000000077 /* DiskModuleView.swift */,
+				8F1A00000000000000000078 /* NetworkModuleView.swift */,
+				8F1A00000000000000000079 /* BatteryModuleView.swift */,
+			);
+			path = Modules;
+			sourceTree = "<group>";
+		};
+		8F1A0000000000000000000C /* Settings */ = {
+			isa = PBXGroup;
+			children = (
+				8F1A0000000000000000007A /* SettingsView.swift */,
+			);
+			path = Settings;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		A10000000000000000000010 /* GlassStats */ = {
+		8F1A00000000000000000002 /* GlassStats */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = A10000000000000000000030 /* Build configuration list for PBXNativeTarget "GlassStats" */;
+			buildConfigurationList = 8F1A00000000000000000011 /* Build configuration list for PBXNativeTarget "GlassStats" */;
 			buildPhases = (
-				A10000000000000000000011 /* Sources */,
-				A10000000000000000000004 /* Frameworks */,
-				A10000000000000000000012 /* Resources */,
+				8F1A0000000000000000000D /* Sources */,
+				8F1A0000000000000000000E /* Frameworks */,
+				8F1A0000000000000000000F /* Resources */,
 			);
 			buildRules = (
 			);
 			dependencies = (
 			);
-			fileSystemSynchronizedGroups = (
-				A10000000000000000000003 /* GlassStats */,
-			);
 			name = GlassStats;
-			packageProductDependencies = (
-			);
 			productName = GlassStats;
-			productReference = A10000000000000000000001 /* Glass Stats.app */;
+			productReference = 8F1A00000000000000000003 /* Glass Stats.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
-		A10000000000000000000020 /* Project object */ = {
+		8F1A00000000000000000001 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				BuildIndependentTargetsInParallel = YES;
+				BuildIndependentTargetsInParallel = 1;
 				LastSwiftUpdateCheck = 1600;
 				LastUpgradeCheck = 1600;
 				TargetAttributes = {
-					A10000000000000000000010 = {
+					8F1A00000000000000000002 = {
 						CreatedOnToolsVersion = 16.0;
 					};
 				};
 			};
-			buildConfigurationList = A10000000000000000000021 /* Build configuration list for PBXProject "GlassStats" */;
+			buildConfigurationList = 8F1A00000000000000000010 /* Build configuration list for PBXProject "GlassStats" */;
+			compatibilityVersion = "Xcode 15.0";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
 				en,
 				Base,
 			);
-			mainGroup = A10000000000000000000005;
-			minimizedProjectReferenceProxies = 1;
-			preferredProjectObjectVersion = 77;
-			productRefGroup = A10000000000000000000006 /* Products */;
+			mainGroup = 8F1A00000000000000000004;
+			productRefGroup = 8F1A00000000000000000005 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				A10000000000000000000010 /* GlassStats */,
+				8F1A00000000000000000002 /* GlassStats */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
-		A10000000000000000000012 /* Resources */ = {
+		8F1A0000000000000000000F /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				8F1A00000000000000000017 /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
-		A10000000000000000000011 /* Sources */ = {
+		8F1A0000000000000000000D /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				8F1A00000000000000000258 /* GlassStatsApp.swift in Sources */,
+				8F1A00000000000000000259 /* ModuleSettings.swift in Sources */,
+				8F1A0000000000000000025A /* MonitorStore.swift in Sources */,
+				8F1A0000000000000000025B /* SystemSnapshot.swift in Sources */,
+				8F1A0000000000000000025C /* MachSupport.swift in Sources */,
+				8F1A0000000000000000025D /* HostCPU.swift in Sources */,
+				8F1A0000000000000000025E /* HostMemory.swift in Sources */,
+				8F1A0000000000000000025F /* HostProcesses.swift in Sources */,
+				8F1A00000000000000000260 /* HostDisk.swift in Sources */,
+				8F1A00000000000000000261 /* HostNetwork.swift in Sources */,
+				8F1A00000000000000000262 /* HostBattery.swift in Sources */,
+				8F1A00000000000000000263 /* SystemSampler.swift in Sources */,
+				8F1A00000000000000000264 /* GlassTheme.swift in Sources */,
+				8F1A00000000000000000265 /* MenuBarLabel.swift in Sources */,
+				8F1A00000000000000000266 /* PopoverRootView.swift in Sources */,
+				8F1A00000000000000000267 /* UsageChart.swift in Sources */,
+				8F1A00000000000000000268 /* CPUModuleView.swift in Sources */,
+				8F1A00000000000000000269 /* MemoryModuleView.swift in Sources */,
+				8F1A0000000000000000026A /* TopProcessesView.swift in Sources */,
+				8F1A0000000000000000026B /* DiskModuleView.swift in Sources */,
+				8F1A0000000000000000026C /* NetworkModuleView.swift in Sources */,
+				8F1A0000000000000000026D /* BatteryModuleView.swift in Sources */,
+				8F1A0000000000000000026E /* SettingsView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin XCBuildConfiguration section */
-		A10000000000000000000022 /* Debug */ = {
+		8F1A00000000000000000012 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
-				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
 				CLANG_ANALYZER_NONNULL = YES;
-				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_ENABLE_OBJC_ARC = YES;
-				CLANG_ENABLE_OBJC_WEAK = YES;
-				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
-				CLANG_WARN_BOOL_CONVERSION = YES;
-				CLANG_WARN_COMMA = YES;
-				CLANG_WARN_CONSTANT_CONVERSION = YES;
-				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
-				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
-				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
-				CLANG_WARN_EMPTY_BODY = YES;
-				CLANG_WARN_ENUM_CONVERSION = YES;
-				CLANG_WARN_INFINITE_RECURSION = YES;
-				CLANG_WARN_INT_CONVERSION = YES;
-				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
-				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
-				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
-				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
-				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
-				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
-				CLANG_WARN_STRICT_PROTOTYPES = YES;
-				CLANG_WARN_SUSPICIOUS_MOVE = YES;
-				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
-				CLANG_WARN_UNREACHABLE_CODE = YES;
-				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
-				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
-				ENABLE_USER_SCRIPT_SANDBOXING = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu17;
-				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_PREPROCESSOR_DEFINITIONS = (
@@ -191,78 +297,36 @@
 				);
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
-				GCC_WARN_UNDECLARED_SELECTOR = YES;
-				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
-				GCC_WARN_UNUSED_FUNCTION = YES;
-				GCC_WARN_UNUSED_VARIABLE = YES;
-				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
 				MACOSX_DEPLOYMENT_TARGET = 14.0;
-				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
-				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = macosx;
-				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 			};
 			name = Debug;
 		};
-		A10000000000000000000023 /* Release */ = {
+		8F1A00000000000000000013 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
-				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
 				CLANG_ANALYZER_NONNULL = YES;
-				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_ENABLE_OBJC_ARC = YES;
-				CLANG_ENABLE_OBJC_WEAK = YES;
-				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
-				CLANG_WARN_BOOL_CONVERSION = YES;
-				CLANG_WARN_COMMA = YES;
-				CLANG_WARN_CONSTANT_CONVERSION = YES;
-				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
-				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
-				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
-				CLANG_WARN_EMPTY_BODY = YES;
-				CLANG_WARN_ENUM_CONVERSION = YES;
-				CLANG_WARN_INFINITE_RECURSION = YES;
-				CLANG_WARN_INT_CONVERSION = YES;
-				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
-				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
-				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
-				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
-				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
-				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
-				CLANG_WARN_STRICT_PROTOTYPES = YES;
-				CLANG_WARN_SUSPICIOUS_MOVE = YES;
-				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
-				CLANG_WARN_UNREACHABLE_CODE = YES;
-				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
-				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
-				ENABLE_USER_SCRIPT_SANDBOXING = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu17;
 				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
-				GCC_WARN_UNDECLARED_SELECTOR = YES;
-				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
-				GCC_WARN_UNUSED_FUNCTION = YES;
-				GCC_WARN_UNUSED_VARIABLE = YES;
-				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
 				MACOSX_DEPLOYMENT_TARGET = 14.0;
-				MTL_ENABLE_DEBUG_INFO = NO;
-				MTL_FAST_MATH = YES;
 				SDKROOT = macosx;
 				SWIFT_COMPILATION_MODE = wholemodule;
 			};
 			name = Release;
 		};
-		A10000000000000000000031 /* Debug */ = {
+		8F1A00000000000000000014 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ARCHS = arm64;
@@ -272,7 +336,6 @@
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 1;
-				DEAD_CODE_STRIPPING = YES;
 				ENABLE_APP_SANDBOX = NO;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
@@ -290,16 +353,16 @@
 				MARKETING_VERSION = 0.1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.hkclaw.GlassStats;
 				PRODUCT_NAME = "Glass Stats";
-				REGISTER_APP_GROUPS = NO;
 				SDKROOT = macosx;
 				SUPPORTED_PLATFORMS = macosx;
 				SUPPORTS_MACCATALYST = NO;
 				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_OBJC_BRIDGING_HEADER = "GlassStats/GlassStats-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
 			};
 			name = Debug;
 		};
-		A10000000000000000000032 /* Release */ = {
+		8F1A00000000000000000015 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ARCHS = arm64;
@@ -309,7 +372,6 @@
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 1;
-				DEAD_CODE_STRIPPING = YES;
 				ENABLE_APP_SANDBOX = NO;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
@@ -327,11 +389,11 @@
 				MARKETING_VERSION = 0.1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.hkclaw.GlassStats;
 				PRODUCT_NAME = "Glass Stats";
-				REGISTER_APP_GROUPS = NO;
 				SDKROOT = macosx;
 				SUPPORTED_PLATFORMS = macosx;
 				SUPPORTS_MACCATALYST = NO;
 				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_OBJC_BRIDGING_HEADER = "GlassStats/GlassStats-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
 			};
 			name = Release;
@@ -339,25 +401,25 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		A10000000000000000000021 /* Build configuration list for PBXProject "GlassStats" */ = {
+		8F1A00000000000000000010 /* Build configuration list for PBXProject "GlassStats" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				A10000000000000000000022 /* Debug */,
-				A10000000000000000000023 /* Release */,
+				8F1A00000000000000000012 /* Debug */,
+				8F1A00000000000000000013 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		A10000000000000000000030 /* Build configuration list for PBXNativeTarget "GlassStats" */ = {
+		8F1A00000000000000000011 /* Build configuration list for PBXNativeTarget "GlassStats" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				A10000000000000000000031 /* Debug */,
-				A10000000000000000000032 /* Release */,
+				8F1A00000000000000000014 /* Debug */,
+				8F1A00000000000000000015 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
-	rootObject = A10000000000000000000020 /* Project object */;
+	rootObject = 8F1A00000000000000000001 /* Project object */;
 }

@@ -50,10 +50,10 @@ final class ModuleSettings: ObservableObject {
         didSet { UserDefaults.standard.set(showMemoryInMenuBar, forKey: Key.menuMemory) }
     }
 
-    /// Seconds between Mach / IOKit samples. Values are clamped to 0.5...5.
+    /// Seconds between Mach / IOKit samples. Clamped to 1...5 so the extra stays cheap.
     @Published var refreshInterval: Double {
         didSet {
-            let clamped = min(5, max(0.5, refreshInterval))
+            let clamped = min(5, max(1, refreshInterval))
             if clamped != refreshInterval {
                 refreshInterval = clamped
                 return

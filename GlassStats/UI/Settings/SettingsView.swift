@@ -15,6 +15,9 @@ struct SettingsView: View {
                 .tabItem { Label("About", systemImage: "info.circle") }
         }
         .frame(width: 460, height: 360)
+        .onAppear {
+            NSApplication.shared.activate()
+        }
     }
 
     private var modules: some View {
@@ -29,9 +32,9 @@ struct SettingsView: View {
             }
             Section("Sampling") {
                 Picker("Refresh interval", selection: $settings.refreshInterval) {
-                    Text("0.5 s").tag(0.5)
                     Text("1 s").tag(1.0)
                     Text("2 s").tag(2.0)
+                    Text("5 s").tag(5.0)
                 }
                 Text("CPU and memory are live Mach samples. Disk, network, and battery are basic V1 readouts.")
                     .font(.caption)

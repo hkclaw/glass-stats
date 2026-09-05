@@ -14,7 +14,7 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "A10000000000000000000010"
+               BlueprintIdentifier = "8F1A00000000000000000002"
                BuildableName = "Glass Stats.app"
                BlueprintName = "GlassStats"
                ReferencedContainer = "container:GlassStats.xcodeproj">
@@ -43,7 +43,7 @@
          runnableDebuggingMode = "0">
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "A10000000000000000000010"
+            BlueprintIdentifier = "8F1A00000000000000000002"
             BuildableName = "Glass Stats.app"
             BlueprintName = "GlassStats"
             ReferencedContainer = "container:GlassStats.xcodeproj">
@@ -60,7 +60,7 @@
          runnableDebuggingMode = "0">
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "A10000000000000000000010"
+            BlueprintIdentifier = "8F1A00000000000000000002"
             BuildableName = "Glass Stats.app"
             BlueprintName = "GlassStats"
             ReferencedContainer = "container:GlassStats.xcodeproj">

@@ -51,9 +51,6 @@ struct PopoverRootView: View {
             }
             .help("Settings")
             .glassControlStyle()
-            .simultaneousGesture(TapGesture().onEnded {
-                NSApplication.shared.activate()
-            })
             Button {
                 NSApplication.shared.terminate(nil)
             } label: {

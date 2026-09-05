@@ -19,6 +19,7 @@ need LICENSE
 need README.md
 need GlassStats/GlassStatsApp.swift
 need GlassStats/GlassStats.entitlements
+need GlassStats/GlassStats-Bridging-Header.h
 need GlassStats/Sampling/HostCPU.swift
 need GlassStats/Sampling/HostMemory.swift
 need GlassStats/UI/GlassTheme.swift
@@ -28,8 +29,20 @@ grep -q 'LSUIElement' GlassStats.xcodeproj/project.pbxproj project.yml || {
   echo "LSUIElement missing from project settings"
   fail=1
 }
-grep -q 'PBXFileSystemSynchronizedRootGroup' GlassStats.xcodeproj/project.pbxproj || {
-  echo "folder-synced group missing"
+grep -q 'GlassStatsApp.swift in Sources' GlassStats.xcodeproj/project.pbxproj || {
+  echo "GlassStatsApp.swift is not in the Sources phase"
+  fail=1
+}
+grep -q 'HostCPU.swift in Sources' GlassStats.xcodeproj/project.pbxproj || {
+  echo "HostCPU.swift is not in the Sources phase"
+  fail=1
+}
+grep -q '#available(macOS 26' GlassStats/UI/GlassTheme.swift || {
+  echo "Liquid Glass availability check missing"
+  fail=1
+}
+grep -q 'ultraThinMaterial' GlassStats/UI/GlassTheme.swift || {
+  echo "ultraThinMaterial fallback missing"
   fail=1
 }
 grep -q 'host_processor_info' GlassStats/Sampling/MachSupport.swift || {

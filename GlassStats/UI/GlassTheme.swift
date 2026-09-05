@@ -7,26 +7,42 @@ enum GlassTheme {
 }
 
 extension View {
-    /// Liquid Glass on macOS 26+ / Swift 6.2 SDKs; vibrancy material otherwise.
-    @ViewBuilder
+    /// Liquid Glass on macOS 26 via `#available(macOS 26, *)` + `.glassEffect`.
+    /// Older OS (and older SDKs that lack the symbol) use `.ultraThinMaterial`.
     func glassCard(cornerRadius: CGFloat = GlassTheme.panelRadius) -> some View {
         let shape = RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
+        return self
+            .padding(12)
+            .modifier(LiquidGlassBackground(shape: shape))
+    }
+
+    func glassPopoverChrome() -> some View {
+        modifier(LiquidGlassChrome())
+    }
+
+    func glassControlStyle() -> some View {
+        modifier(LiquidGlassControl())
+    }
+}
+
+private struct LiquidGlassBackground<S: Shape>: ViewModifier {
+    var shape: S
+
+    @ViewBuilder
+    func body(content: Content) -> some View {
         #if compiler(>=6.2) || swift(>=6.2)
-        if #available(macOS 26.0, *) {
-            self
-                .padding(12)
-                .glassEffect(.regular, in: shape)
+        if #available(macOS 26, *) {
+            content.glassEffect(.regular, in: shape)
         } else {
-            legacyGlassCard(shape: shape)
+            materialFallback(content)
         }
         #else
-        legacyGlassCard(shape: shape)
+        materialFallback(content)
         #endif
     }
 
-    func legacyGlassCard(shape: RoundedRectangle) -> some View {
-        self
-            .padding(12)
+    private func materialFallback(_ content: Content) -> some View {
+        content
             .background(.ultraThinMaterial, in: shape)
             .overlay {
                 shape.strokeBorder(
@@ -43,30 +59,34 @@ extension View {
                 )
             }
     }
+}
 
+private struct LiquidGlassChrome: ViewModifier {
     @ViewBuilder
-    func glassPopoverChrome() -> some View {
+    func body(content: Content) -> some View {
         #if compiler(>=6.2) || swift(>=6.2)
-        if #available(macOS 26.0, *) {
-            self
+        if #available(macOS 26, *) {
+            content
         } else {
-            background(.ultraThinMaterial)
+            content.background(.ultraThinMaterial)
         }
         #else
-        background(.ultraThinMaterial)
+        content.background(.ultraThinMaterial)
         #endif
     }
+}
 
+private struct LiquidGlassControl: ViewModifier {
     @ViewBuilder
-    func glassControlStyle() -> some View {
+    func body(content: Content) -> some View {
         #if compiler(>=6.2) || swift(>=6.2)
-        if #available(macOS 26.0, *) {
-            self.buttonStyle(.glass)
+        if #available(macOS 26, *) {
+            content.buttonStyle(.glass)
         } else {
-            self.buttonStyle(.bordered)
+            content.buttonStyle(.bordered)
         }
         #else
-        self.buttonStyle(.bordered)
+        content.buttonStyle(.bordered)
         #endif
     }
 }
@@ -76,7 +96,7 @@ struct GlassStack<Content: View>: View {
 
     var body: some View {
         #if compiler(>=6.2) || swift(>=6.2)
-        if #available(macOS 26.0, *) {
+        if #available(macOS 26, *) {
             GlassEffectContainer(spacing: 14) {
                 VStack(alignment: .leading, spacing: 12, content: content)
             }
