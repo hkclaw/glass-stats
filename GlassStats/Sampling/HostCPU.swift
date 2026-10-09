@@ -1,42 +1,62 @@
 import Foundation
 
-/// Live CPU utilization from Mach `host_processor_info(PROCESSOR_CPU_LOAD_INFO)`
-/// plus `host_statistics(HOST_CPU_LOAD_INFO)` as a cross-check for the total.
-/// Utilization is the delta of (user+system+nice) / (user+system+nice+idle).
+/// System-wide CPU utilization matching Activity Monitor's overall CPU
+/// (user + system + nice) / (user + system + nice + idle), from Mach
+/// `HOST_CPU_LOAD_INFO` tick deltas. Per-core bars use `host_processor_info`.
 struct HostCPU {
-    private var previousCores: [CPUTicks]?
     private var previousTotal: CPUTicks?
+    private var previousCores: [CPUTicks]?
+    /// EMA so the menu bar tracks Activity Monitor's smoothed feel (not one noisy second).
+    private var smoothed: Double?
+    private let smoothAlpha: Double = 0.45
 
     mutating func sample() -> CPUSnapshot {
-        let coresBuffer = CoreTickBuffer.read()
         let loadInfo = MachSupport.hostCPULoad().map(CPUTicks.fromLoadInfo)
-
-        guard let coresBuffer else {
-            return .empty
-        }
+        let coresBuffer = CoreTickBuffer.read()
 
         var coreFractions: [Double] = []
-        if let previousCores, previousCores.count == coresBuffer.ticks.count {
-            coreFractions = zip(coresBuffer.ticks, previousCores).map { current, previous in
-                current.utilization(since: previous)
+        if let coresBuffer {
+            if let previousCores, previousCores.count == coresBuffer.ticks.count {
+                coreFractions = zip(coresBuffer.ticks, previousCores).map { current, previous in
+                    current.utilization(since: previous)
+                }
             }
+            previousCores = coresBuffer.ticks
+        }
+
+        var instant: Double?
+        var isReady = false
+
+        if let loadInfo {
+            if let previousTotal {
+                let raw = loadInfo.utilization(since: previousTotal)
+                // Ignore pathological tiny windows / counter glitches.
+                if loadInfo.total > previousTotal.total {
+                    instant = raw
+                    isReady = true
+                }
+            }
+            previousTotal = loadInfo
+        } else if !coreFractions.isEmpty {
+            // Fallback: mean of per-core busy fractions (== aggregate when cores are equal weight).
+            instant = coreFractions.reduce(0, +) / Double(coreFractions.count)
+            isReady = previousCores != nil
         }
 
         let total: Double
-        if let loadInfo, let previousTotal {
-            total = loadInfo.utilization(since: previousTotal)
-        } else if !coreFractions.isEmpty {
-            total = coreFractions.reduce(0, +) / Double(coreFractions.count)
+        if let instant {
+            if let smoothed {
+                let next = smoothed * (1 - smoothAlpha) + instant * smoothAlpha
+                self.smoothed = next
+                total = next
+            } else {
+                self.smoothed = instant
+                total = instant
+            }
         } else {
-            total = 0
+            total = smoothed ?? 0
         }
 
-        let isReady = previousCores != nil || previousTotal != nil
-        previousCores = coresBuffer.ticks
-        if let loadInfo {
-            previousTotal = loadInfo
-        }
-
-        return CPUSnapshot(total: total, cores: coreFractions, isReady: isReady)
+        return CPUSnapshot(total: total, cores: coreFractions, isReady: isReady || smoothed != nil)
     }
 }
