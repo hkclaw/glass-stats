@@ -36,7 +36,7 @@ struct SettingsView: View {
                     Text("2 s").tag(2.0)
                     Text("5 s").tag(5.0)
                 }
-                Text("CPU and memory are live Mach samples. Disk, network, and battery are basic V1 readouts.")
+                Text("CPU and memory stay on the timer for the menu bar. Processes, disk, network, and battery sample only while the popover is open.")
                     .font(.caption)
                     .foregroundStyle(.secondary)
             }

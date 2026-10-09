@@ -20,7 +20,7 @@ struct TopProcessesView: View {
                         Spacer()
                         Text(Formatters.percent(process.cpu))
                             .foregroundStyle(.secondary)
-                            .frame(width: 40, alignment: .trailing)
+                            .frame(width: 48, alignment: .trailing)
                         Text(Formatters.bytes(process.residentBytes))
                             .foregroundStyle(.secondary)
                             .frame(width: 64, alignment: .trailing)

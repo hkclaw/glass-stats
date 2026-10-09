@@ -10,30 +10,35 @@ struct PopoverRootView: View {
             header
                 .padding(.bottom, 10)
 
-            GlassStack {
-                if settings.cpuEnabled {
-                    CPUModuleView()
-                }
-                if settings.memoryEnabled {
-                    MemoryModuleView()
-                }
-                if settings.processesEnabled {
-                    TopProcessesView()
-                }
-                if settings.diskEnabled {
-                    DiskModuleView()
-                }
-                if settings.networkEnabled {
-                    NetworkModuleView()
-                }
-                if settings.batteryEnabled {
-                    BatteryModuleView()
+            ScrollView {
+                GlassStack {
+                    if settings.cpuEnabled {
+                        CPUModuleView()
+                    }
+                    if settings.memoryEnabled {
+                        MemoryModuleView()
+                    }
+                    if settings.processesEnabled {
+                        TopProcessesView()
+                    }
+                    if settings.diskEnabled {
+                        DiskModuleView()
+                    }
+                    if settings.networkEnabled {
+                        NetworkModuleView()
+                    }
+                    if settings.batteryEnabled {
+                        BatteryModuleView()
+                    }
                 }
             }
+            .frame(maxHeight: GlassTheme.popoverMaxHeight)
         }
         .padding(14)
         .frame(width: GlassTheme.popoverWidth)
         .glassPopoverChrome()
+        .onAppear { store.setPopoverOpen(true) }
+        .onDisappear { store.setPopoverOpen(false) }
     }
 
     private var header: some View {

@@ -5,18 +5,16 @@ struct MenuBarLabel: View {
     @EnvironmentObject private var store: MonitorStore
 
     var body: some View {
-        HStack(spacing: 6) {
-            Image(systemName: "gauge.medium")
-                .symbolRenderingMode(.hierarchical)
+        HStack(spacing: 4) {
             if settings.showCPUInMenuBar {
-                Text(cpuText)
+                Text(cpuShort)
             }
             if settings.showCPUInMenuBar, settings.showMemoryInMenuBar {
                 Text("·")
                     .foregroundStyle(.secondary)
             }
             if settings.showMemoryInMenuBar {
-                Text(memoryText)
+                Text(memoryShort)
             }
             if !settings.showCPUInMenuBar, !settings.showMemoryInMenuBar {
                 Text("Glass")
@@ -24,20 +22,22 @@ struct MenuBarLabel: View {
         }
         .font(.system(size: 11, weight: .semibold, design: .rounded))
         .monospacedDigit()
+        // MenuBarExtra labels can stick on some macOS builds without an identity bump.
+        .id(store.snapshot.timestamp)
         .accessibilityLabel(accessibility)
     }
 
-    private var cpuText: String {
-        guard store.snapshot.cpu.isReady else { return "CPU —" }
-        return "CPU \(Formatters.percent(store.snapshot.cpu.total))"
+    private var cpuShort: String {
+        guard store.snapshot.cpu.isReady else { return "—" }
+        return Formatters.percent(store.snapshot.cpu.total)
     }
 
-    private var memoryText: String {
-        guard store.snapshot.memory.isReady else { return "MEM —" }
-        return "MEM \(Formatters.percent(store.snapshot.memory.usedRatio))"
+    private var memoryShort: String {
+        guard store.snapshot.memory.isReady else { return "—" }
+        return Formatters.percent(store.snapshot.memory.usedRatio)
     }
 
     private var accessibility: String {
-        "Glass Stats, \(cpuText), \(memoryText)"
+        "Glass Stats, CPU \(cpuShort), memory \(memoryShort)"
     }
 }

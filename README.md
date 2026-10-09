@@ -27,13 +27,13 @@ Intel Macs are out of scope for V1 (`ARCHS = arm64`).
 1. Clone this repo and open **`GlassStats.xcodeproj`** in Xcode. The shared **GlassStats** scheme should be selected.
 2. Select the **GlassStats** target → **Signing & Capabilities** → choose your **Team**. The app is **not sandboxed** on purpose (see Permissions).
 3. Destination: **My Mac** (Apple Silicon).
-4. Press **Run** (⌘R). Glass Stats is an accessory app (`LSUIElement`): there is **no Dock icon**. Look in the **menu bar** for `CPU · MEM`.
+4. Press **Run** (⌘R). Glass Stats is an accessory app (`LSUIElement`): there is **no Dock icon**. Look in the **menu bar** for the CPU and memory percents, like `12% · 48%`. VoiceOver still hears “CPU” and “memory”.
 5. Click the status item for the popover (charts, top processes, disk / network / battery). Open **Settings** from the gear, or **Glass Stats → Settings…** once the app is frontmost.
 6. Quit from the popover power button, or **Activity Monitor**.
 
 **macOS Tahoe** may need **System Settings → Menu Bar** to allow the app icon. If the status item does not appear, open that pane (sometimes under Desktop & Dock) and enable **Glass Stats**.
 
-Sampling defaults to **1 second** (Settings: 1 / 2 / 5 s) so the extra does not burn battery. GPU / fans / sensors are V1.1 only — this app does not call private SMC APIs.
+Sampling defaults to **1 second** (Settings: 1 / 2 / 5 s). The menu bar keeps **CPU and memory** on that timer. **Processes, disk, network, and battery pause while the popover is closed**, and a module that is turned off is not sampled. GPU / fans / sensors are V1.1 only — this app does not call private SMC APIs.
 
 Optional: if you use [XcodeGen](https://github.com/yonaskolb/XcodeGen), `project.yml` can regenerate the project (`xcodegen generate`). A checked-in `.xcodeproj` is already present so you do not need XcodeGen to build.
 
@@ -43,15 +43,15 @@ Optional: if you use [XcodeGen](https://github.com/yonaskolb/XcodeGen), `project
 
 | Module | V1 | Source of numbers |
 | --- | --- | --- |
-| CPU (menu bar + chart + per-core bars) | Live | Mach `host_processor_info(PROCESSOR_CPU_LOAD_INFO)` and `host_statistics(HOST_CPU_LOAD_INFO)`. Load is the **delta** of `(user+system+nice) / (user+system+nice+idle)` between samples — not a placeholder. |
+| CPU (menu bar + chart + per-core bars) | Live | Mach `host_statistics(HOST_CPU_LOAD_INFO)` for the total and `host_processor_info(PROCESSOR_CPU_LOAD_INFO)` for per-core bars. Load is the **delta** of `(user+system+nice) / (user+system+nice+idle)`. The menu-bar total is lightly smoothed so it tracks Activity Monitor’s overall CPU. |
 | Memory (menu bar + chart) | Live | `host_statistics64(HOST_VM_INFO64)` + `ProcessInfo.physicalMemory` (`hw.memsize`). Used ≈ app (internal − purgeable) + wired + compressor. **File cache is excluded** so idle RAM does not read as ~100%. |
-| Top processes | Live | `proc_listpids` + `proc_pidinfo(PROC_PIDTASKINFO)`. CPU% is a two-sample delta of user+system nanoseconds / (elapsed × logical CPU count). |
+| Top processes | Live, popover only | `proc_listpids` + `proc_pidinfo(PROC_PIDTASKINFO)`. Names are resolved for the top 8 only. CPU% is one core, like Activity Monitor: user+system nanoseconds / elapsed time (not divided by core count). A process using one full core reads about 100%; a process using several cores can read above 100%, capped at the logical CPU count. |
 | Disk | Basic | Boot volume via `URL` resource values (`volumeTotalCapacity`, `volumeAvailableCapacityForImportantUsage`). |
 | Network | Basic | `getifaddrs` / `AF_LINK` `if_data` byte counters, shown as B/s. |
 | Battery | Basic | IOKit `IOPSCopyPowerSourcesInfo`. Desktops show “no internal battery”. |
 | GPU / fans / sensors | V1.1 | Documented only. |
 
-Compare CPU and Memory Used with **Activity Monitor** after a second or two of samples. First ticks show “—” because utilization is a difference between two Mach snapshots.
+Compare CPU and Memory Used with **Activity Monitor** after a second or two of samples. First ticks show “—” because utilization is a difference between two Mach snapshots. Process CPU uses the same one-core scale as Activity Monitor’s CPU column. Open the popover to start process, disk, network, and battery samples.
 
 ## Permissions
 

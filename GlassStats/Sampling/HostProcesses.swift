@@ -2,11 +2,18 @@ import Darwin
 import Foundation
 
 /// Top processes via `proc_listpids` + `proc_pidinfo(PROC_PIDTASKINFO)`.
-/// CPU percent needs two samples of `pti_total_user` + `pti_total_system`
-/// (nanoseconds) divided by elapsed wall time and logical CPU count.
+/// Names are resolved only for the rows that will be shown.
+/// CPU is a share of one core: delta(user+system nanoseconds) / elapsed wall time,
+/// clamped to the logical CPU count (the most one process can use).
 struct HostProcesses {
     private var previousCPUTime: [pid_t: UInt64] = [:]
     private var previousSampleAt: Date?
+
+    private struct Scan {
+        var pid: pid_t
+        var fraction: Double
+        var residentBytes: UInt64
+    }
 
     mutating func sample(limit: Int = 8) -> [ProcessRow] {
         let now = Date()
@@ -14,8 +21,8 @@ struct HostProcesses {
         let cpuCount = max(1, ProcessInfo.processInfo.processorCount)
         let elapsed = previousSampleAt.map { now.timeIntervalSince($0) } ?? 0
         var nextCPUTime: [pid_t: UInt64] = [:]
-        var rows: [ProcessRow] = []
-        rows.reserveCapacity(min(limit * 4, pids.count))
+        var scans: [Scan] = []
+        scans.reserveCapacity(pids.count)
 
         for pid in pids {
             guard pid > 0, let task = Self.taskInfo(pid) else { continue }
@@ -25,14 +32,14 @@ struct HostProcesses {
             var fraction = 0.0
             if elapsed > 0, let previous = previousCPUTime[pid], cpuNanos >= previous {
                 let deltaSeconds = Double(cpuNanos - previous) / 1_000_000_000.0
-                fraction = max(0, deltaSeconds / (elapsed * Double(cpuCount)))
+                let oneCore = deltaSeconds / elapsed
+                fraction = min(Double(cpuCount), max(0, oneCore))
             }
 
-            rows.append(
-                ProcessRow(
+            scans.append(
+                Scan(
                     pid: pid,
-                    name: Self.processName(pid),
-                    cpu: fraction,
+                    fraction: fraction,
                     residentBytes: task.pti_resident_size
                 )
             )
@@ -41,13 +48,20 @@ struct HostProcesses {
         previousCPUTime = nextCPUTime
         previousSampleAt = now
 
-        return rows
+        return scans
             .sorted {
-                if $0.cpu != $1.cpu { return $0.cpu > $1.cpu }
+                if $0.fraction != $1.fraction { return $0.fraction > $1.fraction }
                 return $0.residentBytes > $1.residentBytes
             }
             .prefix(limit)
-            .map { $0 }
+            .map { scan in
+                ProcessRow(
+                    pid: scan.pid,
+                    name: Self.processName(scan.pid),
+                    cpu: scan.fraction,
+                    residentBytes: scan.residentBytes
+                )
+            }
     }
 
     private static func allPIDs() -> [pid_t] {

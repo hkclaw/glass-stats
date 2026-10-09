@@ -70,6 +70,22 @@ grep -q 'Not affiliated' README.md || {
   echo "README missing affiliation disclaimer"
   fail=1
 }
+grep -q 'struct SampleRequest' GlassStats/Models/SystemSnapshot.swift || {
+  echo "SampleRequest missing"
+  fail=1
+}
+grep -q 'setPopoverOpen' GlassStats/App/MonitorStore.swift GlassStats/UI/PopoverRootView.swift || {
+  echo "popover sampling gate missing"
+  fail=1
+}
+grep -q 'ScrollView' GlassStats/UI/PopoverRootView.swift || {
+  echo "popover scroll view missing"
+  fail=1
+}
+grep -q 'deltaSeconds / elapsed' GlassStats/Sampling/HostProcesses.swift || {
+  echo "process CPU is not one-core scale"
+  fail=1
+}
 
 if [[ "$fail" -ne 0 ]]; then
   echo "verify-skeleton: FAIL"

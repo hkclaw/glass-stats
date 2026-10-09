@@ -110,14 +110,27 @@ struct ProcessRow: Identifiable, Equatable {
     var id: Int32 { pid }
     var pid: Int32
     var name: String
-    /// Share of *all* logical cores, 0...1. Can exceed 1/ncpu on a single core.
+    /// Share of one logical core, matching Activity Monitor. 1.0 is 100% of one core.
+    /// Multi-core processes can exceed 1, up to the logical CPU count.
     var cpu: Double
     var residentBytes: UInt64
+}
+
+/// Which host reads to perform. Unrequested fields keep their previous values.
+struct SampleRequest: Equatable {
+    var cpu: Bool
+    var memory: Bool
+    var disk: Bool
+    var network: Bool
+    var battery: Bool
+    var processes: Bool
 }
 
 struct SampleResult: Equatable {
     var snapshot: SystemSnapshot
     var processes: [ProcessRow]
+    var didSampleCPU: Bool
+    var didSampleMemory: Bool
 }
 
 enum Formatters {

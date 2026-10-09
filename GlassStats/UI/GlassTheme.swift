@@ -3,6 +3,7 @@ import SwiftUI
 enum GlassTheme {
     static let panelRadius: CGFloat = 16
     static let popoverWidth: CGFloat = 384
+    static let popoverMaxHeight: CGFloat = 560
     static let accent = Color.cyan
 }
 
@@ -45,7 +46,7 @@ private struct LiquidGlassBackground<S: Shape>: ViewModifier {
         content
             .background(.ultraThinMaterial, in: shape)
             .overlay {
-                shape.strokeBorder(
+                shape.stroke(
                     LinearGradient(
                         colors: [
                             Color.white.opacity(0.38),
