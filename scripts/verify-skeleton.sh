@@ -70,6 +70,12 @@ grep -q 'Not affiliated' README.md || {
   echo "README missing affiliation disclaimer"
   fail=1
 }
+grep -q 'docs/images/popover.png' README.md || {
+  echo "README missing popover preview"
+  fail=1
+}
+need docs/images/popover.png
+need docs/images/settings.png
 grep -q 'struct SampleRequest' GlassStats/Models/SystemSnapshot.swift || {
   echo "SampleRequest missing"
   fail=1

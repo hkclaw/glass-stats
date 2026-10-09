@@ -1,80 +1,91 @@
+<p align="center">
+  <img src="GlassStats/Assets.xcassets/AppIcon.appiconset/icon_256.png" width="96" alt="Glass Stats app icon" />
+</p>
+
 # Glass Stats
 
-Self-developed **macOS menu bar** system monitor. Native Swift / SwiftUI, Apple Silicon first, local only.
+A native **macOS menu bar** monitor for Apple Silicon. CPU and memory sit in the menu bar. Click once for a glass popover with charts, the processes using the machine, and a quick read on disk, network, and battery.
 
-Liquid Glass–styled when you compile against the latest SDK (macOS 26 APIs). On older SDKs and runtimes it falls back to `.ultraThinMaterial` / vibrancy. No ads, no tracking, no network telemetry.
+Local only. No ads, no tracking, no account.
 
-**Not affiliated with, endorsed by, or derived from [Stats](https://mac-stats.com/) (exelban).** Glass Stats is an independent project. It does not use Stats trademarks, assets, or source code.
+**Not affiliated with [Stats](https://mac-stats.com/) / exelban.** Independent app. No Stats trademarks, assets, or code.
 
-## Status
+<p align="center">
+  <img src="docs/images/popover.png" width="820" alt="Menu bar showing 18% and 46%, with the Glass Stats popover open over the desktop" />
+</p>
 
-V1 skeleton: live **CPU** + **RAM** in the menu bar and a glass popover with charts and top processes. Settings toggles show or hide modules. Disk, Network, and Battery are basic scaffolds. GPU / fans / sensors are **V1.1** (not implemented).
+<p align="center"><em>Interface preview of the V1 layout. On your Mac the figures are live samples, not this illustration.</em></p>
 
-## Requirements
+## Why it’s worth opening
+
+- **One glance in the menu bar.** Short percents (`18% · 46%`). VoiceOver still says CPU and memory. No Dock icon.
+- **A popover you can actually read.** Charts for CPU and RAM, per-core bars, and the top processes. Scrolls instead of running off the screen.
+- **Numbers you can compare with Activity Monitor.** CPU is a Mach tick delta, lightly smoothed. Process CPU is one core (about 100% for a full core). Memory used skips the file cache, so an idle Mac does not read as full.
+- **Modules you can turn off.** Hide disk, network, battery, or the process list. Those heavier reads run only while the popover is open.
+- **Stays on the machine.** No analytics SDK and no network client.
+
+GPU, fans, and sensors are **V1.1** — not in this build, and the app does not call private SMC APIs.
+
+<p align="center">
+  <img src="docs/images/settings.png" width="720" alt="Glass Stats settings with module toggles and a 1 second refresh interval" />
+</p>
+
+## Build and run
 
 | | |
 | --- | --- |
-| Mac | Apple Silicon (arm64 only in this project) |
-| OS to *run* | **macOS 14.0** Sonoma or later |
-| OS for Liquid Glass | **macOS 26** (Tahoe) when built with Xcode 26 |
-| Xcode | **16.0+** to open the checked-in project; **26** recommended so `.glassEffect` compiles in |
-| Signing | Your Apple Development team (Signing & Capabilities) |
+| Mac | Apple Silicon (`arm64` only) |
+| Run on | **macOS 14.0** or later |
+| Liquid Glass | **macOS 26** when built with Xcode 26. Older OS uses `.ultraThinMaterial` |
+| Xcode | **16** or later. Xcode **26** recommended |
+| Signing | Your Apple Development team |
 
-Intel Macs are out of scope for V1 (`ARCHS = arm64`).
+1. Clone and open **`GlassStats.xcodeproj`**. Use the shared **GlassStats** scheme.
+2. Target **GlassStats** → **Signing & Capabilities** → choose your **Team**. Leave the App Sandbox **off**.
+3. Destination: **My Mac**.
+4. **Run** (⌘R). Look in the **menu bar** for the percents. There is no Dock icon.
+5. Click the status item for charts and processes. The gear opens Settings.
+6. Quit from the power button in the popover, or from Activity Monitor.
 
-## Open, build, and run (M4 Pro)
+**macOS Tahoe** may need **System Settings → Menu Bar** before the icon is allowed to show (sometimes under Desktop & Dock).
 
-1. Clone this repo and open **`GlassStats.xcodeproj`** in Xcode. The shared **GlassStats** scheme should be selected.
-2. Select the **GlassStats** target → **Signing & Capabilities** → choose your **Team**. The app is **not sandboxed** on purpose (see Permissions).
-3. Destination: **My Mac** (Apple Silicon).
-4. Press **Run** (⌘R). Glass Stats is an accessory app (`LSUIElement`): there is **no Dock icon**. Look in the **menu bar** for the CPU and memory percents, like `12% · 48%`. VoiceOver still hears “CPU” and “memory”.
-5. Click the status item for the popover (charts, top processes, disk / network / battery). Open **Settings** from the gear, or **Glass Stats → Settings…** once the app is frontmost.
-6. Quit from the popover power button, or **Activity Monitor**.
-
-**macOS Tahoe** may need **System Settings → Menu Bar** to allow the app icon. If the status item does not appear, open that pane (sometimes under Desktop & Dock) and enable **Glass Stats**.
-
-Sampling defaults to **1 second** (Settings: 1 / 2 / 5 s). The menu bar keeps **CPU and memory** on that timer. **Processes, disk, network, and battery pause while the popover is closed**, and a module that is turned off is not sampled. GPU / fans / sensors are V1.1 only — this app does not call private SMC APIs.
-
-Optional: if you use [XcodeGen](https://github.com/yonaskolb/XcodeGen), `project.yml` can regenerate the project (`xcodegen generate`). A checked-in `.xcodeproj` is already present so you do not need XcodeGen to build.
+Sampling defaults to **1 second** (Settings: 1 / 2 / 5 s). Optional regenerate: `xcodegen generate` from [`project.yml`](project.yml). You do not need XcodeGen to build.
 
 **Deployment target:** macOS 14.0. **Bundle ID:** `com.hkclaw.GlassStats`. **Version:** 0.1.0.
 
-## What is live vs scaffolded
+## What is measured
 
-| Module | V1 | Source of numbers |
+| Module | V1 | Where the number comes from |
 | --- | --- | --- |
-| CPU (menu bar + chart + per-core bars) | Live | Mach `host_statistics(HOST_CPU_LOAD_INFO)` for the total and `host_processor_info(PROCESSOR_CPU_LOAD_INFO)` for per-core bars. Load is the **delta** of `(user+system+nice) / (user+system+nice+idle)`. The menu-bar total is lightly smoothed so it tracks Activity Monitor’s overall CPU. |
-| Memory (menu bar + chart) | Live | `host_statistics64(HOST_VM_INFO64)` + `ProcessInfo.physicalMemory` (`hw.memsize`). Used ≈ app (internal − purgeable) + wired + compressor. **File cache is excluded** so idle RAM does not read as ~100%. |
-| Top processes | Live, popover only | `proc_listpids` + `proc_pidinfo(PROC_PIDTASKINFO)`. Names are resolved for the top 8 only. CPU% is one core, like Activity Monitor: user+system nanoseconds / elapsed time (not divided by core count). A process using one full core reads about 100%; a process using several cores can read above 100%, capped at the logical CPU count. |
-| Disk | Basic | Boot volume via `URL` resource values (`volumeTotalCapacity`, `volumeAvailableCapacityForImportantUsage`). |
-| Network | Basic | `getifaddrs` / `AF_LINK` `if_data` byte counters, shown as B/s. |
-| Battery | Basic | IOKit `IOPSCopyPowerSourcesInfo`. Desktops show “no internal battery”. |
-| GPU / fans / sensors | V1.1 | Documented only. |
+| CPU | Live | `host_statistics(HOST_CPU_LOAD_INFO)` for the total, `host_processor_info` for each core. Busy time is the delta of user + system + nice over all ticks. The menu bar total is lightly smoothed. |
+| Memory | Live | `host_statistics64(HOST_VM_INFO64)` and `hw.memsize`. Used ≈ app (internal − purgeable) + wired + compressed. File cache is excluded. |
+| Top processes | Live, popover only | `proc_listpids` and `proc_pidinfo`. Names are resolved for the top 8. CPU is one core, like Activity Monitor, capped at the logical CPU count. |
+| Disk | Basic | Boot volume capacity from URL resource values. |
+| Network | Basic | `getifaddrs` byte counters, shown per second. |
+| Battery | Basic | IOKit power sources. Desktops say there is no internal battery. |
+| GPU / fans / sensors | V1.1 | Not implemented. |
 
-Compare CPU and Memory Used with **Activity Monitor** after a second or two of samples. First ticks show “—” because utilization is a difference between two Mach snapshots. Process CPU uses the same one-core scale as Activity Monitor’s CPU column. Open the popover to start process, disk, network, and battery samples.
+The first tick can show “—” because utilization is the difference between two samples. Open the popover to start process, disk, network, and battery reads.
 
 ## Permissions
 
-- **No** Accessibility, Screen Recording, Full Disk Access, or Location prompts for V1 CPU / RAM.
-- **App Sandbox is off.** A sandboxed menu-bar monitor cannot enumerate other processes with `libproc` or read host-wide Mach stats the way Activity Monitor does. This matches a local utility, not a Mac App Store sandbox profile.
-- Hardened Runtime is enabled. Use your Development team to sign locally.
-- **Open at Login** uses `SMAppService`. macOS may require the built app to live in `/Applications` before the registration sticks.
-- Nothing is uploaded. There is no analytics SDK and no network client.
+- No Accessibility, Screen Recording, Full Disk Access, or Location prompt for V1 CPU and RAM.
+- **App Sandbox is off** so the app can list other processes and read host Mach stats the way a local utility does.
+- Hardened Runtime is on. Sign with your Development team.
+- **Open at Login** uses `SMAppService`. macOS may require the app to live in `/Applications` before that sticks.
 
 ## Project layout
 
 ```
-GlassStats.xcodeproj/     Checked-in Xcode project (explicit file list; opens in Xcode 16+)
+GlassStats.xcodeproj/     Checked-in Xcode project
 project.yml               Optional XcodeGen spec
-GlassStats/
-  GlassStatsApp.swift     MenuBarExtra (window) + Settings scene
-  App/                    Store + persisted module toggles
-  Models/                 Snapshots
-  Sampling/               Mach / libproc / IOKit / getifaddrs
-  UI/                     Liquid Glass theme, popover, charts, settings
-  Assets.xcassets         Original app icon (not from Stats)
+GlassStats/               App, sampling, and SwiftUI
+docs/images/              README interface previews
+scripts/previews/         HTML used to render those previews
 LICENSE                   MIT
 ```
+
+Regenerate the pictures with `scripts/render_previews.sh` (Chrome). They are layout previews, not a capture from a running Mac.
 
 ## Disclaimer
 

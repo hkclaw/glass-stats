@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Glass Stats settings preview</title>
+  <link rel="stylesheet" href="preview.css" />
+  <style>
+    html, body { width: 1100px; height: 640px; }
+  </style>
+</head>
+<body>
+  <div class="settings-wrap">
+    <section class="window" aria-label="Glass Stats settings">
+      <div class="titlebar">
+        <div class="lights"><i class="r"></i><i class="y"></i><i class="g"></i></div>
+        <div class="tabs">
+          <div class="tab on">Modules</div>
+          <div class="tab">Menu Bar</div>
+          <div class="tab">About</div>
+        </div>
+      </div>
+      <div class="form">
+        <div class="section-label">Popover</div>
+        <div class="group">
+          <div class="toggle-row">CPU <span class="switch"></span></div>
+          <div class="toggle-row">Memory <span class="switch"></span></div>
+          <div class="toggle-row">Top processes <span class="switch"></span></div>
+          <div class="toggle-row">Disk (scaffold) <span class="switch"></span></div>
+          <div class="toggle-row">Network (scaffold) <span class="switch"></span></div>
+          <div class="toggle-row">Battery (scaffold) <span class="switch off"></span></div>
+        </div>
+        <div class="section-label">Sampling</div>
+        <div class="group">
+          <div class="picker-row">
+            Refresh interval
+            <div class="segment"><span class="on">1 s</span><span>2 s</span><span>5 s</span></div>
+          </div>
+        </div>
+        <p class="note">CPU and memory stay on the timer for the menu bar. Processes, disk, network, and battery sample only while the popover is open.</p>
+      </div>
+    </section>
+  </div>
+</body>
+</html>
