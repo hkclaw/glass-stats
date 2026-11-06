@@ -21,7 +21,7 @@ struct NetworkModuleView: View {
         VStack(alignment: .leading, spacing: 2) {
             Label(title, systemImage: systemImage)
                 .font(.caption)
-                .foregroundStyle(.secondary)
+                .glassCaptionText()
             Text(ready ? Formatters.rate(value) : "—")
                 .font(.caption.monospacedDigit())
         }

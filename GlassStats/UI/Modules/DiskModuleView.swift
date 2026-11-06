@@ -12,18 +12,18 @@ struct DiskModuleView: View {
                 Spacer()
                 Text(disk.isReady ? Formatters.percent(disk.usedRatio) : "—")
                     .font(.caption.monospacedDigit())
-                    .foregroundStyle(.secondary)
+                    .glassSecondaryText()
             }
             if disk.isReady {
                 ProgressView(value: disk.usedRatio)
                     .tint(.orange)
                 Text("\(disk.volumeName) · \(Formatters.bytes(disk.availableBytes)) free of \(Formatters.bytes(disk.totalBytes))")
                     .font(.caption)
-                    .foregroundStyle(.secondary)
+                    .glassSecondaryText()
             } else {
                 Text("Unable to read the boot volume.")
                     .font(.caption)
-                    .foregroundStyle(.secondary)
+                    .glassSecondaryText()
             }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
