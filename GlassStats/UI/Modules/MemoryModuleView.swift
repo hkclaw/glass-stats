@@ -2,6 +2,9 @@ import SwiftUI
 
 struct MemoryModuleView: View {
     @EnvironmentObject private var store: MonitorStore
+    @Environment(\.colorScheme) private var colorScheme
+
+    private var tint: Color { GlassTheme.memoryTint(colorScheme) }
 
     var body: some View {
         let memory = store.snapshot.memory
@@ -12,16 +15,16 @@ struct MemoryModuleView: View {
                 Spacer()
                 Text(memory.isReady ? Formatters.percent(memory.usedRatio) : "—")
                     .font(.system(.title3, design: .rounded).monospacedDigit())
-                    .foregroundStyle(Color.mint)
+                    .foregroundStyle(tint)
             }
 
-            UsageChart(points: store.history, keyPath: \.memory, tint: .mint)
+            UsageChart(points: store.history, keyPath: \.memory, tint: tint)
 
             if memory.isReady {
                 VStack(alignment: .leading, spacing: 4) {
                     Text("\(Formatters.bytes(memory.usedBytes)) used of \(Formatters.bytes(memory.physicalBytes))")
                         .font(.caption)
-                        .foregroundStyle(.secondary)
+                        .glassSecondaryText()
                     HStack(spacing: 10) {
                         metric("App", memory.appBytes)
                         metric("Wired", memory.wiredBytes)
@@ -38,7 +41,7 @@ struct MemoryModuleView: View {
         VStack(alignment: .leading, spacing: 1) {
             Text(title)
                 .font(.caption2)
-                .foregroundStyle(.secondary)
+                .glassCaptionText()
             Text(Formatters.bytes(bytes))
                 .font(.caption.monospacedDigit())
         }

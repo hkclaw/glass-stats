@@ -12,22 +12,22 @@ struct BatteryModuleView: View {
             if !battery.isReady {
                 Text("Reading power sources…")
                     .font(.caption)
-                    .foregroundStyle(.secondary)
+                    .glassSecondaryText()
             } else if !battery.isPresent {
                 Text("No internal battery (desktop or adapter-only).")
                     .font(.caption)
-                    .foregroundStyle(.secondary)
+                    .glassSecondaryText()
             } else {
                 if let fraction = battery.fraction {
                     ProgressView(value: fraction)
                         .tint(battery.isCharging ? .green : .yellow)
                     Text("\(Formatters.percent(fraction)) · \(statusText(battery))")
                         .font(.caption)
-                        .foregroundStyle(.secondary)
+                        .glassSecondaryText()
                 } else {
                     Text(statusText(battery))
                         .font(.caption)
-                        .foregroundStyle(.secondary)
+                        .glassSecondaryText()
                 }
             }
         }

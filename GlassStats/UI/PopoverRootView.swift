@@ -48,7 +48,7 @@ struct PopoverRootView: View {
                     .font(.headline)
                 Text("Local only · Apple Silicon")
                     .font(.caption)
-                    .foregroundStyle(.secondary)
+                    .glassSecondaryText()
             }
             Spacer()
             SettingsLink {
@@ -74,4 +74,14 @@ struct PopoverRootView: View {
         .environmentObject(settings)
         .environmentObject(store)
         .frame(height: 640)
+}
+
+#Preview("Light") {
+    let settings = ModuleSettings()
+    let store = MonitorStore(settings: settings)
+    return PopoverRootView()
+        .environmentObject(settings)
+        .environmentObject(store)
+        .frame(height: 640)
+        .preferredColorScheme(.light)
 }
