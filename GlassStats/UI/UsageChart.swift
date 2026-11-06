@@ -8,8 +8,8 @@ struct UsageChart: View {
     var keyPath: KeyPath<HistoryPoint, Double>
     var tint: Color
 
-    /// Dark keeps the original wash and hairline. Light keeps a readable stroke, but a heavy
-    /// area fill recolors the whole card, so the wash stays under the line.
+    /// Dark keeps the original wash and hairline. Light keeps a readable stroke and a
+    /// wash that is composited only inside the plot, on the same surface as the card.
     private var areaTopOpacity: Double { colorScheme == .light ? 0.15 : 0.35 }
     private var areaBottomOpacity: Double { colorScheme == .light ? 0.03 : 0.02 }
     private var lineWidth: CGFloat { colorScheme == .light ? 2 : 1.6 }
@@ -21,6 +21,34 @@ struct UsageChart: View {
     }
 
     var body: some View {
+        framedChart
+            .overlay {
+                if points.isEmpty {
+                    Text("Collecting samples…")
+                        .font(.caption)
+                        .glassSecondaryText()
+                }
+            }
+            .accessibilityHidden(points.isEmpty)
+    }
+
+    @ViewBuilder
+    private var framedChart: some View {
+        if colorScheme == .light {
+            // Plot backdrop matches the card, and the chart is clipped, so the wash
+            // cannot refract into the title row or the padding.
+            marks
+                .chartPlotStyle { plot in
+                    plot.background(GlassTheme.lightCardSurface).clipped()
+                }
+                .frame(height: 72)
+                .clipped()
+        } else {
+            marks.frame(height: 72)
+        }
+    }
+
+    private var marks: some View {
         Chart(points) { point in
             AreaMark(
                 x: .value("Time", point.date),
@@ -56,15 +84,6 @@ struct UsageChart: View {
                 }
             }
         }
-        .frame(height: 72)
-        .overlay {
-            if points.isEmpty {
-                Text("Collecting samples…")
-                    .font(.caption)
-                    .glassSecondaryText()
-            }
-        }
-        .accessibilityHidden(points.isEmpty)
     }
 
     @ViewBuilder
