@@ -18,6 +18,10 @@ enum GlassTheme {
         scheme == .light ? Color(red: 0.00, green: 0.48, blue: 0.44) : .mint
     }
 
+    /// One opaque face for every light card. Translucent glass was sampling the chart
+    /// wash, so CPU cards went blue and memory cards went mint while process cards stayed white.
+    static let lightCardSurface = Color(red: 0.980, green: 0.982, blue: 0.984)
+
     /// Specular top edge and a neutral hairline. Same job as the dark stroke, without a blue rim.
     static let lightRim = LinearGradient(
         colors: [
@@ -82,7 +86,7 @@ private struct LiquidGlassBackground<S: InsettableShape>: ViewModifier {
         #if compiler(>=6.2) || swift(>=6.2)
         if #available(macOS 26, *) {
             if colorScheme == .light {
-                lightSystemGlass(content)
+                neutralLightCard(content)
             } else {
                 content.glassEffect(.regular, in: shape)
             }
@@ -97,7 +101,7 @@ private struct LiquidGlassBackground<S: InsettableShape>: ViewModifier {
     @ViewBuilder
     private func materialFallback(_ content: Content) -> some View {
         if colorScheme == .light {
-            lightMaterialCard(content)
+            neutralLightCard(content)
         } else {
             content
                 .background(.ultraThinMaterial, in: shape)
@@ -118,25 +122,22 @@ private struct LiquidGlassBackground<S: InsettableShape>: ViewModifier {
         }
     }
 
-    /// Same material family as the shell: a neutral frost and a hairline. No drop shadow —
-    /// shadowing translucent glass casts the colored halo that made the cards look stuck on.
-    private func lightMaterialCard(_ content: Content) -> some View {
+    /// Identical neutral face on every light card, including macOS 26. `.glassEffect` refracts
+    /// the chart wash into the title row, so light cards do not use it. Dark still does.
+    private func neutralLightCard(_ content: Content) -> some View {
         content
             .background {
                 shape
-                    .fill(.ultraThinMaterial)
-                    .overlay {
-                        shape.fill(Color.white.opacity(0.38))
-                    }
+                    .fill(GlassTheme.lightCardSurface)
                     .overlay {
                         shape.fill(
                             LinearGradient(
                                 colors: [
-                                    Color.white.opacity(0.26),
+                                    Color.white.opacity(0.55),
                                     Color.clear
                                 ],
                                 startPoint: .top,
-                                endPoint: .center
+                                endPoint: UnitPoint(x: 0.5, y: 0.22)
                             )
                         )
                     }
@@ -145,18 +146,6 @@ private struct LiquidGlassBackground<S: InsettableShape>: ViewModifier {
                     }
             }
     }
-
-    #if compiler(>=6.2) || swift(>=6.2)
-    /// Same `.regular` glass as dark, plus a neutral hairline so the edge exists on white.
-    @available(macOS 26, *)
-    private func lightSystemGlass(_ content: Content) -> some View {
-        content
-            .glassEffect(.regular, in: shape)
-            .overlay {
-                shape.strokeBorder(GlassTheme.lightRim, lineWidth: 0.75)
-            }
-    }
-    #endif
 }
 
 private struct LiquidGlassChrome: ViewModifier {
