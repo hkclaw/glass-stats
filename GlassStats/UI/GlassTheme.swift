@@ -18,14 +18,15 @@ enum GlassTheme {
         scheme == .light ? Color(red: 0.00, green: 0.48, blue: 0.44) : .mint
     }
 
+    /// Specular top edge and a neutral hairline. Same job as the dark stroke, without a blue rim.
     static let lightRim = LinearGradient(
         colors: [
-            Color.white.opacity(0.98),
-            Color(red: 0.42, green: 0.51, blue: 0.62).opacity(0.78),
-            Color(red: 0.26, green: 0.34, blue: 0.44).opacity(0.62)
+            Color.white.opacity(0.92),
+            Color.black.opacity(0.08),
+            Color.black.opacity(0.14)
         ],
-        startPoint: .top,
-        endPoint: .bottom
+        startPoint: .topLeading,
+        endPoint: .bottomTrailing
     )
 }
 
@@ -117,29 +118,21 @@ private struct LiquidGlassBackground<S: InsettableShape>: ViewModifier {
         }
     }
 
-    /// Brighter frosted card on the darker shell: material, white veil, specular lid, rim, shadow.
+    /// Same material family as the shell: a neutral frost and a hairline. No drop shadow —
+    /// shadowing translucent glass casts the colored halo that made the cards look stuck on.
     private func lightMaterialCard(_ content: Content) -> some View {
         content
             .background {
                 shape
-                    .fill(.thinMaterial)
+                    .fill(.ultraThinMaterial)
                     .overlay {
-                        shape.fill(
-                            LinearGradient(
-                                colors: [
-                                    Color.white.opacity(0.58),
-                                    Color.white.opacity(0.30)
-                                ],
-                                startPoint: .top,
-                                endPoint: .bottom
-                            )
-                        )
+                        shape.fill(Color.white.opacity(0.38))
                     }
                     .overlay {
                         shape.fill(
                             LinearGradient(
                                 colors: [
-                                    Color.white.opacity(0.40),
+                                    Color.white.opacity(0.26),
                                     Color.clear
                                 ],
                                 startPoint: .top,
@@ -148,26 +141,20 @@ private struct LiquidGlassBackground<S: InsettableShape>: ViewModifier {
                         )
                     }
                     .overlay {
-                        shape.strokeBorder(GlassTheme.lightRim, lineWidth: 1)
+                        shape.strokeBorder(GlassTheme.lightRim, lineWidth: 0.75)
                     }
-                    .shadow(color: Color.black.opacity(0.16), radius: 7, y: 3)
             }
     }
 
     #if compiler(>=6.2) || swift(>=6.2)
-    /// Separate glass piece: white tint, its own rim, and a shadow. Dark stays `.regular` with no extra chrome.
+    /// Same `.regular` glass as dark, plus a neutral hairline so the edge exists on white.
     @available(macOS 26, *)
     private func lightSystemGlass(_ content: Content) -> some View {
         content
-            .glassEffect(
-                .regular.tint(Color(red: 0.94, green: 0.97, blue: 1.0).opacity(0.55)),
-                in: shape
-            )
+            .glassEffect(.regular, in: shape)
             .overlay {
-                shape.strokeBorder(GlassTheme.lightRim, lineWidth: 1)
+                shape.strokeBorder(GlassTheme.lightRim, lineWidth: 0.75)
             }
-            .compositingGroup()
-            .shadow(color: Color.black.opacity(0.14), radius: 7, y: 3)
     }
     #endif
 }
@@ -201,27 +188,20 @@ private struct LiquidGlassChrome: ViewModifier {
         }
     }
 
-    /// Cooler, deeper shell so frosted cards and white controls lift off it. Specular stays behind the type.
+    /// Neutral material, a step darker than the cards. No slate or cyan wash — that paint
+    /// showed through the glass and turned every card the same pastel blue.
     private func lightShell(_ content: Content) -> some View {
         content.background {
             ZStack {
-                Rectangle().fill(.regularMaterial)
+                Rectangle().fill(.thinMaterial)
+                Color.black.opacity(0.045)
                 LinearGradient(
                     colors: [
-                        Color(red: 0.63, green: 0.70, blue: 0.78).opacity(0.58),
-                        Color(red: 0.50, green: 0.58, blue: 0.68).opacity(0.50)
-                    ],
-                    startPoint: .topLeading,
-                    endPoint: .bottomTrailing
-                )
-                LinearGradient(
-                    colors: [
-                        Color.white.opacity(0.32),
-                        Color.cyan.opacity(0.06),
+                        Color.white.opacity(0.22),
                         Color.clear
                     ],
                     startPoint: .top,
-                    endPoint: UnitPoint(x: 0.5, y: 0.28)
+                    endPoint: UnitPoint(x: 0.5, y: 0.18)
                 )
             }
         }
@@ -249,37 +229,25 @@ private struct LiquidGlassControl: ViewModifier {
     }
 }
 
-/// White glass circle with a dark glyph and a real rim. System bordered buttons sit white-on-pale-gray.
+/// Frosted circle in the same family as the cards. A hairline only — a drop shadow reads as a floating halo.
 private struct LightGlassButtonStyle: ButtonStyle {
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
             .font(.system(size: 13, weight: .semibold))
             .foregroundStyle(
                 Color(red: 0.12, green: 0.16, blue: 0.22)
-                    .opacity(configuration.isPressed ? 0.55 : 0.94)
+                    .opacity(configuration.isPressed ? 0.55 : 0.92)
             )
             .frame(width: 30, height: 28)
             .background {
                 Circle()
-                    .fill(Color.white.opacity(configuration.isPressed ? 0.72 : 0.92))
+                    .fill(.ultraThinMaterial)
                     .overlay {
-                        Circle().strokeBorder(
-                            LinearGradient(
-                                colors: [
-                                    Color.white,
-                                    Color(red: 0.34, green: 0.42, blue: 0.52).opacity(0.72)
-                                ],
-                                startPoint: .top,
-                                endPoint: .bottom
-                            ),
-                            lineWidth: 1
-                        )
+                        Circle().fill(Color.white.opacity(configuration.isPressed ? 0.45 : 0.62))
                     }
-                    .shadow(
-                        color: Color.black.opacity(configuration.isPressed ? 0.06 : 0.16),
-                        radius: 2,
-                        y: 1
-                    )
+                    .overlay {
+                        Circle().strokeBorder(Color.primary.opacity(0.16), lineWidth: 0.75)
+                    }
             }
             .contentShape(Circle())
     }
