@@ -35,14 +35,13 @@ struct UsageChart: View {
     @ViewBuilder
     private var framedChart: some View {
         if colorScheme == .light {
-            // Plot backdrop matches the card, and the chart is clipped, so the wash
-            // cannot refract into the title row or the padding.
+            // Same surface as the card, so the wash stays in the plot. Do not clip:
+            // 100% and 0% are centered on the plot edges and a clip cuts them in half.
             marks
                 .chartPlotStyle { plot in
-                    plot.background(GlassTheme.lightCardSurface).clipped()
+                    plot.background(GlassTheme.lightCardSurface)
                 }
                 .frame(height: 72)
-                .clipped()
         } else {
             marks.frame(height: 72)
         }
