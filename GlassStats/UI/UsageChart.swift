@@ -8,14 +8,15 @@ struct UsageChart: View {
     var keyPath: KeyPath<HistoryPoint, Double>
     var tint: Color
 
-    /// Dark keeps the original wash and hairline. Light needs a stronger fill and stroke on white.
-    private var areaTopOpacity: Double { colorScheme == .light ? 0.42 : 0.35 }
-    private var areaBottomOpacity: Double { colorScheme == .light ? 0.08 : 0.02 }
+    /// Dark keeps the original wash and hairline. Light keeps a readable stroke, but a heavy
+    /// area fill recolors the whole card, so the wash stays under the line.
+    private var areaTopOpacity: Double { colorScheme == .light ? 0.15 : 0.35 }
+    private var areaBottomOpacity: Double { colorScheme == .light ? 0.03 : 0.02 }
     private var lineWidth: CGFloat { colorScheme == .light ? 2 : 1.6 }
-    private var gridLineWidth: CGFloat { colorScheme == .light ? 0.8 : 0.4 }
+    private var gridLineWidth: CGFloat { colorScheme == .light ? 0.7 : 0.4 }
     private var gridColor: Color {
         colorScheme == .light
-            ? Color(red: 0.16, green: 0.22, blue: 0.30).opacity(0.55)
+            ? Color.primary.opacity(0.18)
             : Color.secondary.opacity(0.25)
     }
 
