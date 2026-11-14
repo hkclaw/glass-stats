@@ -231,6 +231,8 @@ public enum SleepSelection {
     public static let holdingTypes: Set<String> = [
         "PreventUserIdleSystemSleep",
         "NoIdleSleepAssertion",
+        "PreventUserIdleDisplaySleep",
+        "NoDisplaySleepAssertion",
     ]
 
     /// Daemons that hold sleep on behalf of the system. The lowest remaining pid is the line the popover shows.
@@ -438,6 +440,7 @@ public struct AttentionBoard {
     private var situation: SamplingSituation
     private var calendar: Calendar
     private var lastTickAt: Date
+    private var lastAppliedAt: Date
     private var headline: MenuHeadline
     private var published: Attention
 
@@ -450,6 +453,7 @@ public struct AttentionBoard {
         self.situation = situation
         self.calendar = calendar
         self.lastTickAt = now
+        self.lastAppliedAt = .distantPast
         self.headline = MenuHeadline(cpu: nil, memory: nil, accessibilityLabel: "Glass Stats")
         self.published = Attention(
             headline: MenuHeadline(cpu: nil, memory: nil, accessibilityLabel: "Glass Stats"),
@@ -474,6 +478,8 @@ public struct AttentionBoard {
     }
 
     public mutating func ingest(_ tick: AttentionTick) -> Attention {
+        guard tick.at >= lastAppliedAt else { return published }
+        lastAppliedAt = tick.at
         situation = tick.situation
         lastTickAt = tick.at
         switch tick.kind {

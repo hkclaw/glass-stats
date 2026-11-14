@@ -363,6 +363,22 @@ final class AttentionBoardTests: XCTestCase {
         XCTAssertNil(SleepSelection.holder(from: [
             SleepCandidate(pid: 40, name: "powerd", type: "PreventUserIdleSystemSleep")
         ]))
+        XCTAssertEqual(
+            SleepSelection.holder(from: [
+                SleepCandidate(pid: 15, name: "Preview", type: "PreventUserIdleDisplaySleep")
+            ])?.name,
+            "Preview"
+        )
+    }
+
+    func testOlderTickDoesNotRewind() {
+        var board = makeBoard()
+        let at = start
+        board.ingest(tick(at: at.addingTimeInterval(10), cpu: 0.1, cores: [0.1], inbound: 20 * 1024 * 1024, inRate: 1))
+        XCTAssertEqual(board.attention.bursts.count, 1)
+        board.ingest(tick(at: at.addingTimeInterval(5), cpu: 0.1, cores: [0.1], outbound: 20 * 1024 * 1024, outRate: 1))
+        XCTAssertEqual(board.attention.bursts.count, 1)
+        XCTAssertEqual(board.attention.bursts[0].direction, .inbound)
     }
 
     func testTextFormatIsStable() {
