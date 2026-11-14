@@ -3,7 +3,8 @@ import Foundation
 import GlassStatsCore
 
 /// Interface byte counters from `getifaddrs` / `AF_LINK` `if_data`.
-/// Throughput is the delta between samples. 32-bit `ifi_*bytes` wrap is handled.
+/// Throughput is the delta between samples. A decrease is zero, so an interface
+/// going away is not treated as a wrapped counter.
 struct HostNetwork {
     private var previous: Counters?
     private var previousAt: Date?
@@ -32,8 +33,8 @@ struct HostNetwork {
         let elapsed = now.timeIntervalSince(previousAt)
         guard elapsed > 0 else { return .empty }
 
-        let inbound = Self.delta(current.inbound, previous.inbound)
-        let outbound = Self.delta(current.outbound, previous.outbound)
+        let inbound = CounterDelta.bytes(current: current.inbound, previous: previous.inbound)
+        let outbound = CounterDelta.bytes(current: current.outbound, previous: previous.outbound)
         return NetworkSnapshot(
             bytesInPerSecond: UInt64((Double(inbound) / elapsed).rounded()),
             bytesOutPerSecond: UInt64((Double(outbound) / elapsed).rounded()),
@@ -41,11 +42,6 @@ struct HostNetwork {
             bytesOutThisSample: outbound,
             isReady: true
         )
-    }
-
-    private static func delta(_ current: UInt64, _ previous: UInt64) -> UInt64 {
-        if current >= previous { return current - previous }
-        return current &+ (UInt64(UInt32.max) &+ 1) &- previous
     }
 
     private static func readCounters() -> Counters? {

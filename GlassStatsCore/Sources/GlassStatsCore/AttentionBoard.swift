@@ -100,8 +100,26 @@ public struct ProcessDecision: Equatable {
             allowed: true,
             copyText: copy,
             confirmTitle: "Quit \(row.name)?",
-            confirmMessage: "Sends a normal quit to \(row.name) (pid \(row.pid)). Unsaved work in that app may be lost."
+            confirmMessage: "Quits \(row.name) (pid \(row.pid)). Unsaved work may be lost."
         )
+    }
+}
+
+public enum QuitAction: Equatable {
+    case terminate
+    case signal
+    case refuse
+
+    public static func choose(allowed: Bool, hasRunningApplication: Bool, nameStillMatches: Bool) -> QuitAction {
+        guard allowed, nameStillMatches else { return .refuse }
+        return hasRunningApplication ? .terminate : .signal
+    }
+}
+
+public enum CounterDelta {
+    public static func bytes(current: UInt64, previous: UInt64) -> UInt64 {
+        guard current >= previous else { return 0 }
+        return current - previous
     }
 }
 
@@ -605,7 +623,8 @@ public struct AttentionBoard {
         if result.sampled.battery, claim(.battery, at: at) {
             marks[.battery] = at
             if result.snapshot.battery.isReady {
-                applyBattery(result.snapshot.battery, at: at)
+                let busy = result.sampled.processes ? result.processes.first : nil
+                applyBattery(result.snapshot.battery, at: at, busyProcess: busy)
             }
         }
 
@@ -622,7 +641,7 @@ public struct AttentionBoard {
         scanSatisfied = true
     }
 
-    private mutating func applyBattery(_ battery: BatterySnapshot, at: Date) {
+    private mutating func applyBattery(_ battery: BatterySnapshot, at: Date, busyProcess: ProcessRow?) {
         guard battery.isPresent, !battery.isPluggedIn, !battery.isCharging, let fraction = battery.fraction else {
             charge.removeAll()
             drain = nil
@@ -644,8 +663,8 @@ public struct AttentionBoard {
         let perHour = (oldest.fraction - newest.fraction) * 100 / hours
         let rounded = Int(perHour.rounded())
         var line = rounded == 0 ? "<1%/h" : "\(rounded)%/h"
-        if let top = rows.first, top.row.cpu >= 0.30 {
-            line += " · \(top.row.name)"
+        if let busyProcess, busyProcess.cpu >= 0.30 {
+            line += " · \(busyProcess.name)"
         }
         drain = DrainRate(line: line)
     }
@@ -656,6 +675,7 @@ public struct AttentionBoard {
         }
         if !situation.processesEnabled {
             cpuSlot.first = Candidate()
+            rows = []
         }
         if !memoryWanted(situation) {
             memorySlot.first = Candidate()
@@ -1029,6 +1049,9 @@ private struct DiskDaybook: Codable {
             return
         }
         if today == day {
+            if let todayAvailable, Self.gap(available, todayAvailable) < 1_048_576 {
+                return
+            }
             todayAvailable = available
             return
         }
@@ -1041,6 +1064,10 @@ private struct DiskDaybook: Codable {
         }
         self.today = day
         todayAvailable = available
+    }
+
+    private static func gap(_ lhs: UInt64, _ rhs: UInt64) -> UInt64 {
+        lhs >= rhs ? lhs - rhs : rhs - lhs
     }
 }
 

@@ -384,6 +384,52 @@ final class AttentionBoardTests: XCTestCase {
         XCTAssertEqual(board.attention.bursts[0].direction, .inbound)
     }
 
+    func testDrainNameRequiresAProcessSampleOnThatTick() {
+        var board = makeBoard()
+        let at = start
+        let safari = ProcessRow(pid: 7, name: "Safari", cpu: 0.40, residentBytes: 1)
+        board.ingest(batteryTick(at: at, fraction: 0.80, process: safari))
+        board.ingest(batteryTick(at: at.addingTimeInterval(600), fraction: 0.70))
+        XCTAssertEqual(board.attention.drain?.line, "60%/h")
+    }
+
+    func testDisablingProcessesClearsRows() {
+        var board = makeBoard()
+        board.ingest(tick(
+            at: start,
+            cpu: 0.1,
+            cores: [0.1],
+            processes: true,
+            rows: [ProcessRow(pid: 3, name: "Notes", cpu: 0.1, residentBytes: 1)]
+        ))
+        XCTAssertEqual(board.attention.rows.count, 1)
+        var hidden = situation()
+        hidden.processesEnabled = false
+        board.ingest(AttentionTick.situation(hidden, at: start.addingTimeInterval(1)))
+        XCTAssertTrue(board.attention.rows.isEmpty)
+    }
+
+    func testSmallFreeSpaceChangeDoesNotRewriteTheArchive() {
+        var board = makeBoard()
+        let at = start.addingTimeInterval(12 * 3600)
+        board.ingest(diskTick(at: at, available: 100 * gib))
+        let saved = board.persistableData()
+        board.ingest(diskTick(at: at.addingTimeInterval(1), available: 100 * gib - 4096))
+        XCTAssertEqual(board.persistableData(), saved)
+    }
+
+    func testCounterDeltaTreatsADecreaseAsZero() {
+        XCTAssertEqual(CounterDelta.bytes(current: 50, previous: 10), 40)
+        XCTAssertEqual(CounterDelta.bytes(current: 10, previous: 50), 0)
+    }
+
+    func testQuitActionRefusesAReusedPid() {
+        XCTAssertEqual(QuitAction.choose(allowed: true, hasRunningApplication: true, nameStillMatches: true), .terminate)
+        XCTAssertEqual(QuitAction.choose(allowed: true, hasRunningApplication: false, nameStillMatches: true), .signal)
+        XCTAssertEqual(QuitAction.choose(allowed: true, hasRunningApplication: true, nameStillMatches: false), .refuse)
+        XCTAssertEqual(QuitAction.choose(allowed: false, hasRunningApplication: true, nameStillMatches: true), .refuse)
+    }
+
     func testTextFormatIsStable() {
         XCTAssertEqual(TextFormat.percent(1.8), "180%")
         XCTAssertEqual(TextFormat.bytes(48 * 1024 * 1024), "48 MB")

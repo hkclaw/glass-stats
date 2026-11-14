@@ -22,13 +22,28 @@ enum ProcessCommands {
     }
 
     static func quit(pid: Int32, name: String) {
-        guard allows(pid: pid, name: name) else { return }
-        if let app = NSRunningApplication(processIdentifier: pid),
-           app.localizedName?.caseInsensitiveCompare(name) == .orderedSame {
-            app.terminate()
-            return
+        let app = NSRunningApplication(processIdentifier: pid)
+        let procMatches = currentName(pid).caseInsensitiveCompare(name) == .orderedSame
+        let localizedMatches = app?.localizedName?.caseInsensitiveCompare(name) == .orderedSame
+        switch QuitAction.choose(
+            allowed: allows(pid: pid, name: name),
+            hasRunningApplication: app != nil,
+            nameStillMatches: procMatches || localizedMatches
+        ) {
+        case .terminate:
+            app?.terminate()
+        case .signal:
+            kill(pid, SIGTERM)
+        case .refuse:
+            break
         }
-        kill(pid, SIGTERM)
+    }
+
+    private static func currentName(_ pid: Int32) -> String {
+        var buffer = [CChar](repeating: 0, count: 256)
+        let length = proc_name(pid, &buffer, UInt32(buffer.count))
+        guard length > 0 else { return "" }
+        return String(cString: buffer)
     }
 
     private static func allows(pid: Int32, name: String) -> Bool {
