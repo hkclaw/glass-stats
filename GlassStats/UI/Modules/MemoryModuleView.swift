@@ -1,3 +1,4 @@
+import GlassStatsCore
 import SwiftUI
 
 struct MemoryModuleView: View {
@@ -13,7 +14,7 @@ struct MemoryModuleView: View {
                 Label("Memory", systemImage: "memorychip")
                     .font(.subheadline.weight(.semibold))
                 Spacer()
-                Text(memory.isReady ? Formatters.percent(memory.usedRatio) : "—")
+                Text(memory.isReady ? TextFormat.percent(memory.usedRatio) : "—")
                     .font(.system(.title3, design: .rounded).monospacedDigit())
                     .foregroundStyle(tint)
             }
@@ -22,7 +23,7 @@ struct MemoryModuleView: View {
 
             if memory.isReady {
                 VStack(alignment: .leading, spacing: 4) {
-                    Text("\(Formatters.bytes(memory.usedBytes)) used of \(Formatters.bytes(memory.physicalBytes))")
+                    Text("\(Formatters.bytes(memory.usedBytes)) used of \(Formatters.bytes(memory.physicalBytes)) · Pressure \(store.attention.pressure.cardLabel)")
                         .font(.caption)
                         .glassSecondaryText()
                     HStack(spacing: 10) {

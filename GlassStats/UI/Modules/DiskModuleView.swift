@@ -1,3 +1,4 @@
+import GlassStatsCore
 import SwiftUI
 
 struct DiskModuleView: View {
@@ -10,7 +11,7 @@ struct DiskModuleView: View {
                 Label("Disk", systemImage: "internaldrive")
                     .font(.subheadline.weight(.semibold))
                 Spacer()
-                Text(disk.isReady ? Formatters.percent(disk.usedRatio) : "—")
+                Text(disk.isReady ? TextFormat.percent(disk.usedRatio) : "—")
                     .font(.caption.monospacedDigit())
                     .glassSecondaryText()
             }
@@ -20,6 +21,21 @@ struct DiskModuleView: View {
                 Text("\(disk.volumeName) · \(Formatters.bytes(disk.availableBytes)) free of \(Formatters.bytes(disk.totalBytes))")
                     .font(.caption)
                     .glassSecondaryText()
+                if let drop = store.attention.diskDrop {
+                    Text(drop.detail)
+                        .font(.caption)
+                        .glassSecondaryText()
+                    if drop.waitingForCulprits {
+                        Text("Checking the usual heavy folders…")
+                            .font(.caption)
+                            .glassSecondaryText()
+                    }
+                    ForEach(store.attention.culprits) { folder in
+                        Text(folder.label)
+                            .font(.caption.monospacedDigit())
+                            .glassSecondaryText()
+                    }
+                }
             } else {
                 Text("Unable to read the boot volume.")
                     .font(.caption)

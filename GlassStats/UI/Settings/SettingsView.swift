@@ -36,7 +36,7 @@ struct SettingsView: View {
                     Text("2 s").tag(2.0)
                     Text("5 s").tag(5.0)
                 }
-                Text("CPU and memory stay on the timer for the menu bar. Processes, disk, network, and battery sample only while the popover is open.")
+                Text("CPU and memory stay on the menu bar timer. Network counts while its module is on. Battery is read at least every 30 seconds, and disk at least every 5 minutes. Processes run while the popover is closed only when the CPU is busy.")
                     .font(.caption)
                     .foregroundStyle(.secondary)
             }

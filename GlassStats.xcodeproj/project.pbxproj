@@ -30,6 +30,12 @@
 		8F1A0000000000000000026C /* NetworkModuleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8F1A00000000000000000078 /* NetworkModuleView.swift */; };
 		8F1A0000000000000000026D /* BatteryModuleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8F1A00000000000000000079 /* BatteryModuleView.swift */; };
 		8F1A0000000000000000026E /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8F1A0000000000000000007A /* SettingsView.swift */; };
+		8F1A00000000000000000280 /* AttentionStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8F1A00000000000000000080 /* AttentionStore.swift */; };
+		8F1A00000000000000000281 /* HostPressure.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8F1A00000000000000000081 /* HostPressure.swift */; };
+		8F1A00000000000000000282 /* HostAssertions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8F1A00000000000000000082 /* HostAssertions.swift */; };
+		8F1A00000000000000000283 /* FolderScan.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8F1A00000000000000000083 /* FolderScan.swift */; };
+		8F1A00000000000000000284 /* ProcessCommands.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8F1A00000000000000000084 /* ProcessCommands.swift */; };
+		8F1A00000000000000000290 /* GlassStatsCore in Frameworks */ = {isa = PBXBuildFile; productRef = 8F1A00000000000000000091 /* GlassStatsCore */; };
 		8F1A00000000000000000017 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 8F1A00000000000000000016 /* Assets.xcassets */; };
 /* End PBXBuildFile section */
 
@@ -58,6 +64,11 @@
 		8F1A00000000000000000078 /* NetworkModuleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkModuleView.swift; sourceTree = "<group>"; };
 		8F1A00000000000000000079 /* BatteryModuleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BatteryModuleView.swift; sourceTree = "<group>"; };
 		8F1A0000000000000000007A /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		8F1A00000000000000000080 /* AttentionStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AttentionStore.swift; sourceTree = "<group>"; };
+		8F1A00000000000000000081 /* HostPressure.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HostPressure.swift; sourceTree = "<group>"; };
+		8F1A00000000000000000082 /* HostAssertions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HostAssertions.swift; sourceTree = "<group>"; };
+		8F1A00000000000000000083 /* FolderScan.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FolderScan.swift; sourceTree = "<group>"; };
+		8F1A00000000000000000084 /* ProcessCommands.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProcessCommands.swift; sourceTree = "<group>"; };
 		8F1A00000000000000000016 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		8F1A00000000000000000018 /* GlassStats.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = GlassStats.entitlements; sourceTree = "<group>"; };
 		8F1A00000000000000000019 /* GlassStats-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "GlassStats-Bridging-Header.h"; sourceTree = "<group>"; };
@@ -68,6 +79,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				8F1A00000000000000000290 /* GlassStatsCore in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -118,6 +130,7 @@
 			children = (
 				8F1A00000000000000000065 /* ModuleSettings.swift */,
 				8F1A00000000000000000066 /* MonitorStore.swift */,
+				8F1A00000000000000000080 /* AttentionStore.swift */,
 			);
 			path = App;
 			sourceTree = "<group>";
@@ -141,6 +154,9 @@
 				8F1A0000000000000000006D /* HostNetwork.swift */,
 				8F1A0000000000000000006E /* HostBattery.swift */,
 				8F1A0000000000000000006F /* SystemSampler.swift */,
+				8F1A00000000000000000081 /* HostPressure.swift */,
+				8F1A00000000000000000082 /* HostAssertions.swift */,
+				8F1A00000000000000000083 /* FolderScan.swift */,
 			);
 			path = Sampling;
 			sourceTree = "<group>";
@@ -154,6 +170,7 @@
 				8F1A00000000000000000071 /* MenuBarLabel.swift */,
 				8F1A00000000000000000072 /* PopoverRootView.swift */,
 				8F1A00000000000000000073 /* UsageChart.swift */,
+				8F1A00000000000000000084 /* ProcessCommands.swift */,
 			);
 			path = UI;
 			sourceTree = "<group>";
@@ -195,6 +212,9 @@
 			dependencies = (
 			);
 			name = GlassStats;
+			packageProductDependencies = (
+				8F1A00000000000000000091 /* GlassStatsCore */,
+			);
 			productName = GlassStats;
 			productReference = 8F1A00000000000000000003 /* Glass Stats.app */;
 			productType = "com.apple.product-type.application";
@@ -223,6 +243,9 @@
 				Base,
 			);
 			mainGroup = 8F1A00000000000000000004;
+			packageReferences = (
+				8F1A00000000000000000090 /* XCLocalSwiftPackageReference "GlassStatsCore" */,
+			);
 			productRefGroup = 8F1A00000000000000000005 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -271,6 +294,11 @@
 				8F1A0000000000000000026C /* NetworkModuleView.swift in Sources */,
 				8F1A0000000000000000026D /* BatteryModuleView.swift in Sources */,
 				8F1A0000000000000000026E /* SettingsView.swift in Sources */,
+				8F1A00000000000000000280 /* AttentionStore.swift in Sources */,
+				8F1A00000000000000000281 /* HostPressure.swift in Sources */,
+				8F1A00000000000000000282 /* HostAssertions.swift in Sources */,
+				8F1A00000000000000000283 /* FolderScan.swift in Sources */,
+				8F1A00000000000000000284 /* ProcessCommands.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -420,6 +448,21 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCLocalSwiftPackageReference section */
+		8F1A00000000000000000090 /* XCLocalSwiftPackageReference "GlassStatsCore" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = GlassStatsCore;
+		};
+/* End XCLocalSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		8F1A00000000000000000091 /* GlassStatsCore */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 8F1A00000000000000000090 /* XCLocalSwiftPackageReference "GlassStatsCore" */;
+			productName = GlassStatsCore;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 8F1A00000000000000000001 /* Project object */;
 }

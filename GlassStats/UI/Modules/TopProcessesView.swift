@@ -1,37 +1,74 @@
+import GlassStatsCore
 import SwiftUI
 
 struct TopProcessesView: View {
     @EnvironmentObject private var store: MonitorStore
     @Environment(\.colorScheme) private var colorScheme
+    @State private var pendingQuit: ProcessAttention?
 
     var body: some View {
         VStack(alignment: .leading, spacing: 4) {
             Label("Top processes", systemImage: "list.bullet.rectangle")
                 .font(.subheadline.weight(.semibold))
 
-            if store.processes.isEmpty {
+            if store.attention.rows.isEmpty {
                 Text("Waiting for process samples…")
                     .font(.caption)
                     .glassSecondaryText()
             } else {
-                ForEach(store.processes) { process in
+                ForEach(store.attention.rows) { item in
                     HStack(spacing: 8) {
-                        processName(process.name)
+                        VStack(alignment: .leading, spacing: 1) {
+                            processName(item.row.name)
+                            if let since = item.sinceOpenLabel {
+                                Text(since)
+                                    .font(.caption2)
+                                    .glassCaptionText()
+                            }
+                        }
                         Spacer()
-                        processPercent(Formatters.percent(process.cpu))
-                        processMemory(Formatters.bytes(process.residentBytes))
+                        processPercent(TextFormat.percent(item.row.cpu))
+                        processMemory(Formatters.bytes(item.row.residentBytes))
                     }
                     .font(.system(.caption, design: .rounded).monospacedDigit())
                     .accessibilityElement(children: .combine)
+                    .contextMenu {
+                        if item.decision.allowed {
+                            Button("Copy") {
+                                ProcessCommands.copy(item.decision.copyText)
+                            }
+                            Button("Show in Finder") {
+                                ProcessCommands.reveal(pid: item.row.pid, name: item.row.name)
+                            }
+                            Button("Quit…") {
+                                pendingQuit = item
+                            }
+                        }
+                    }
                 }
             }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .glassCard()
+        .confirmationDialog(
+            pendingQuit?.decision.confirmTitle ?? "",
+            isPresented: Binding(
+                get: { pendingQuit != nil },
+                set: { if !$0 { pendingQuit = nil } }
+            ),
+            titleVisibility: .visible
+        ) {
+            Button("Quit", role: .destructive) {
+                if let item = pendingQuit {
+                    ProcessCommands.quit(pid: item.row.pid, name: item.row.name, startToken: item.row.startToken)
+                }
+            }
+            Button("Cancel", role: .cancel) {}
+        } message: {
+            Text(pendingQuit?.decision.confirmMessage ?? "")
+        }
     }
 
-    /// Dark rows stay primary name + hierarchical secondary figures, inheriting the row font.
-    /// Light sets an explicit weight so the parent font cannot flatten the hierarchy.
     @ViewBuilder
     private func processName(_ name: String) -> some View {
         let text = Text(name).lineLimit(1)

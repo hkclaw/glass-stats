@@ -1,4 +1,5 @@
 import Charts
+import GlassStatsCore
 import SwiftUI
 
 struct UsageChart: View {
@@ -76,7 +77,7 @@ struct UsageChart: View {
                     .foregroundStyle(gridColor)
                 if let fraction = value.as(Double.self) {
                     AxisValueLabel {
-                        axisLabel(Formatters.percent(fraction))
+                        axisLabel(TextFormat.percent(fraction))
                     }
                 }
             }

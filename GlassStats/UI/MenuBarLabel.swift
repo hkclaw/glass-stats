@@ -1,43 +1,29 @@
+import GlassStatsCore
 import SwiftUI
 
 struct MenuBarLabel: View {
-    @EnvironmentObject private var settings: ModuleSettings
     @EnvironmentObject private var store: MonitorStore
 
     var body: some View {
+        let headline = store.attention.headline
         HStack(spacing: 4) {
-            if settings.showCPUInMenuBar {
-                Text(cpuShort)
+            if let cpu = headline.cpu {
+                Text(cpu.text)
             }
-            if settings.showCPUInMenuBar, settings.showMemoryInMenuBar {
+            if headline.cpu != nil, headline.memory != nil {
                 Text("·")
                     .foregroundStyle(.secondary)
             }
-            if settings.showMemoryInMenuBar {
-                Text(memoryShort)
+            if let memory = headline.memory {
+                Text(memory.text)
             }
-            if !settings.showCPUInMenuBar, !settings.showMemoryInMenuBar {
+            if headline.cpu == nil, headline.memory == nil {
                 Text("Glass")
             }
         }
         .font(.system(size: 11, weight: .semibold, design: .rounded))
         .monospacedDigit()
-        // MenuBarExtra labels can stick on some macOS builds without an identity bump.
-        .id(store.snapshot.timestamp)
-        .accessibilityLabel(accessibility)
-    }
-
-    private var cpuShort: String {
-        guard store.snapshot.cpu.isReady else { return "—" }
-        return Formatters.percent(store.snapshot.cpu.total)
-    }
-
-    private var memoryShort: String {
-        guard store.snapshot.memory.isReady else { return "—" }
-        return Formatters.percent(store.snapshot.memory.usedRatio)
-    }
-
-    private var accessibility: String {
-        "Glass Stats, CPU \(cpuShort), memory \(memoryShort)"
+        .id("\(store.snapshot.timestamp.timeIntervalSinceReferenceDate) \(headline.cpu?.text ?? "") \(headline.memory?.text ?? "")")
+        .accessibilityLabel(headline.accessibilityLabel)
     }
 }

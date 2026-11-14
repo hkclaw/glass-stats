@@ -1,5 +1,6 @@
 import Darwin
 import Foundation
+import GlassStatsCore
 
 /// Top processes via `proc_listpids` + `proc_pidinfo(PROC_PIDTASKINFO)`.
 /// Names are resolved only for the rows that will be shown.
@@ -13,6 +14,7 @@ struct HostProcesses {
         var pid: pid_t
         var fraction: Double
         var residentBytes: UInt64
+        var startToken: UInt64
     }
 
     mutating func sample(limit: Int = 8) -> [ProcessRow] {
@@ -40,7 +42,8 @@ struct HostProcesses {
                 Scan(
                     pid: pid,
                     fraction: fraction,
-                    residentBytes: task.pti_resident_size
+                    residentBytes: task.pti_resident_size,
+                    startToken: Self.startToken(pid)
                 )
             )
         }
@@ -59,9 +62,20 @@ struct HostProcesses {
                     pid: scan.pid,
                     name: Self.processName(scan.pid),
                     cpu: scan.fraction,
-                    residentBytes: scan.residentBytes
+                    residentBytes: scan.residentBytes,
+                    startToken: scan.startToken
                 )
             }
+    }
+
+    private static func startToken(_ pid: pid_t) -> UInt64 {
+        var info = proc_bsdinfo()
+        let size = Int32(MemoryLayout<proc_bsdinfo>.stride)
+        let result = withUnsafeMutablePointer(to: &info) { pointer in
+            proc_pidinfo(pid, PROC_PIDTBSDINFO, 0, pointer, size)
+        }
+        guard result == size else { return 0 }
+        return info.pbi_start_tvsec &* 1_000_000 &+ info.pbi_start_tvusec
     }
 
     private static func allPIDs() -> [pid_t] {

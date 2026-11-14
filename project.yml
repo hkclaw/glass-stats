@@ -1,6 +1,9 @@
 # XcodeGen spec. A checked-in GlassStats.xcodeproj already opens in Xcode 16+.
 # Optional regenerate: brew install xcodegen && xcodegen generate
 name: GlassStats
+packages:
+  GlassStatsCore:
+    path: GlassStatsCore
 options:
   bundleIdPrefix: com.hkclaw
   deploymentTarget:
@@ -24,6 +27,9 @@ targets:
   GlassStats:
     type: application
     platform: macOS
+    dependencies:
+      - package: GlassStatsCore
+        product: GlassStatsCore
     sources:
       - path: GlassStats
         excludes:

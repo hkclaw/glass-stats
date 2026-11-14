@@ -66,7 +66,7 @@ struct PopoverRootView: View {
 
 #Preview {
     let settings = ModuleSettings()
-    let store = MonitorStore(settings: settings)
+    let store = MonitorStore(settings: settings, loadArchive: { nil }, saveArchive: { _ in })
     return PopoverRootView()
         .environmentObject(settings)
         .environmentObject(store)
@@ -74,7 +74,7 @@ struct PopoverRootView: View {
 
 #Preview("Light") {
     let settings = ModuleSettings()
-    let store = MonitorStore(settings: settings)
+    let store = MonitorStore(settings: settings, loadArchive: { nil }, saveArchive: { _ in })
     return PopoverRootView()
         .environmentObject(settings)
         .environmentObject(store)

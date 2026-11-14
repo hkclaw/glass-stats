@@ -8,7 +8,11 @@ struct GlassStatsApp: App {
     init() {
         let settings = ModuleSettings()
         _settings = StateObject(wrappedValue: settings)
-        _store = StateObject(wrappedValue: MonitorStore(settings: settings))
+        _store = StateObject(wrappedValue: MonitorStore(
+            settings: settings,
+            loadArchive: AttentionStore.load,
+            saveArchive: AttentionStore.save
+        ))
     }
 
     var body: some Scene {

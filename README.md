@@ -18,10 +18,10 @@ Local only. No ads, no tracking, no account.
 
 ## Why it’s worth opening
 
-- **One glance in the menu bar.** Short percents (`18% · 46%`). VoiceOver still says CPU and memory. No Dock icon.
+- **One glance in the menu bar.** Quiet state is two short percents (`18% · 46%`). A busy process name, a pegged core, memory pressure, or a large drop in free space replaces one of those tokens. VoiceOver reads the same pair. No Dock icon.
 - **A popover you can actually read.** Charts for CPU and RAM, per-core bars, the top processes, and disk, network, and battery. The modules fit on one screen.
 - **Numbers you can compare with Activity Monitor.** CPU is a Mach tick delta, lightly smoothed. Process CPU is one core (about 100% for a full core). Memory used skips the file cache, so an idle Mac does not read as full.
-- **Modules you can turn off.** Hide disk, network, battery, or the process list. Those heavier reads run only while the popover is open.
+- **Modules you can turn off.** Hide disk, network, battery, or the process list. Network keeps counting while its module is on, so a burst is still there when you open the popover. Battery is checked at least every 30 seconds, disk capacity at least every 5 minutes, and processes while the popover is closed only when the CPU is busy.
 - **Stays on the machine.** No analytics SDK and no network client.
 
 GPU, fans, and sensors are **V1.1** — not in this build, and the app does not call private SMC APIs.
@@ -59,13 +59,13 @@ Sampling defaults to **1 second** (Settings: 1 / 2 / 5 s). Optional regenerate: 
 | --- | --- | --- |
 | CPU | Live | `host_statistics(HOST_CPU_LOAD_INFO)` for the total, `host_processor_info` for each core. Busy time is the delta of user + system + nice over all ticks. The menu bar total is lightly smoothed. |
 | Memory | Live | `host_statistics64(HOST_VM_INFO64)` and `hw.memsize`. Used ≈ app (internal − purgeable) + wired + compressed. File cache is excluded. |
-| Top processes | Live, popover only | `proc_listpids` and `proc_pidinfo`. Names are resolved for the top 8. CPU is one core, like Activity Monitor, capped at the logical CPU count. |
-| Disk | Basic | Boot volume capacity from URL resource values. |
-| Network | Basic | `getifaddrs` byte counters, shown per second. |
-| Battery | Basic | IOKit power sources. Desktops say there is no internal battery. |
+| Top processes | Live | `proc_listpids` and `proc_pidinfo`. Names are resolved for the top 8. CPU is one core, like Activity Monitor, capped at the logical CPU count. While the popover is closed, this runs when one process could own the CPU. A row can copy a sample, reveal the app, or quit it. |
+| Disk | Basic | Boot volume capacity from URL resource values, at least every 5 minutes. Free space is compared with the previous local day. A drop of 2 GB or more can list DerivedData, Caches, Docker, and CoreSimulator while the popover is open. |
+| Network | Basic | `getifaddrs` byte counters, shown per second, while the module is on. A large burst is kept for a day. |
+| Battery | Basic | IOKit power sources, at least every 30 seconds. On battery, the popover shows a drain rate after a few minutes. Opening the popover also names a process holding idle sleep, when one is. |
 | GPU / fans / sensors | V1.1 | Not implemented. |
 
-The first tick can show “—” because utilization is the difference between two samples. Open the popover to start process, disk, network, and battery reads.
+The first tick can show “—” because utilization is the difference between two samples. Memory pressure comes from `kern.memorystatus_vm_pressure_level`. The menu bar says `warn` or `crit` only after that level has stayed up for three samples.
 
 ## Permissions
 
@@ -79,6 +79,7 @@ The first tick can show “—” because utilization is the difference between 
 ```
 GlassStats.xcodeproj/     Checked-in Xcode project
 project.yml               Optional XcodeGen spec
+GlassStatsCore/           Menu-bar decisions and the tests for them
 GlassStats/               App, sampling, and SwiftUI
 docs/images/              README interface previews
 scripts/previews/         HTML used to render those previews
