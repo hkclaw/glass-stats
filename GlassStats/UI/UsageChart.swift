@@ -8,9 +8,7 @@ struct UsageChart: View {
     var keyPath: KeyPath<HistoryPoint, Double>
     var tint: Color
 
-    /// Dark keeps the original wash and hairline. Light keeps a readable stroke and a
-    /// wash that is composited only inside the plot, on the same surface as the card.
-    private var areaTopOpacity: Double { colorScheme == .light ? 0.15 : 0.35 }
+    private var areaTopOpacity: Double { colorScheme == .light ? 0.15 : 0.10 }
     private var areaBottomOpacity: Double { colorScheme == .light ? 0.03 : 0.02 }
     private var lineWidth: CGFloat { colorScheme == .light ? 2 : 1.6 }
     private var gridLineWidth: CGFloat { colorScheme == .light ? 0.7 : 0.4 }
