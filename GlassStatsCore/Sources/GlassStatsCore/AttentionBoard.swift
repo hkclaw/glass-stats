@@ -235,7 +235,6 @@ public enum SleepSelection {
         "NoDisplaySleepAssertion",
     ]
 
-    /// Daemons that hold sleep on behalf of the system. The lowest remaining pid is the line the popover shows.
     public static let skippedNames: Set<String> = [
         "powerd",
         "kernel_task",

@@ -2,12 +2,15 @@ import XCTest
 import GlassStatsCore
 
 final class AttentionBoardTests: XCTestCase {
-    private let start = Date(timeIntervalSince1970: 1_767_225_600) // 2026-01-01 00:00:00 UTC
-    private var calendar: Calendar = {
+    private let calendar: Calendar = {
         var calendar = Calendar(identifier: .gregorian)
         calendar.timeZone = TimeZone(secondsFromGMT: 0)!
         return calendar
     }()
+
+    private var start: Date {
+        calendar.date(from: DateComponents(calendar: calendar, timeZone: calendar.timeZone, year: 2026, month: 1, day: 1))!
+    }
 
     func testQuietPercents() {
         var board = makeBoard()
