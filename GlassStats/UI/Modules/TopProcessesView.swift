@@ -5,7 +5,7 @@ struct TopProcessesView: View {
     @Environment(\.colorScheme) private var colorScheme
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
+        VStack(alignment: .leading, spacing: 4) {
             Label("Top processes", systemImage: "list.bullet.rectangle")
                 .font(.subheadline.weight(.semibold))
 

@@ -5,7 +5,7 @@ struct BatteryModuleView: View {
 
     var body: some View {
         let battery = store.snapshot.battery
-        VStack(alignment: .leading, spacing: 8) {
+        VStack(alignment: .leading, spacing: 6) {
             Label("Battery", systemImage: battery.isCharging ? "battery.100.bolt" : "battery.75")
                 .font(.subheadline.weight(.semibold))
 

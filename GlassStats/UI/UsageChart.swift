@@ -39,9 +39,9 @@ struct UsageChart: View {
                 .chartPlotStyle { plot in
                     plot.background(GlassTheme.lightCardSurface)
                 }
-                .frame(height: 72)
+                .frame(height: GlassTheme.chartHeight)
         } else {
-            marks.frame(height: 72)
+            marks.frame(height: GlassTheme.chartHeight)
         }
     }
 

@@ -84,10 +84,10 @@ grep -q 'setPopoverOpen' GlassStats/App/MonitorStore.swift GlassStats/UI/Popover
   echo "popover sampling gate missing"
   fail=1
 }
-grep -q 'ScrollView' GlassStats/UI/PopoverRootView.swift || {
-  echo "popover scroll view missing"
+if grep -q 'ScrollView' GlassStats/UI/PopoverRootView.swift; then
+  echo "popover should show every module without a scroll view"
   fail=1
-}
+fi
 grep -q 'deltaSeconds / elapsed' GlassStats/Sampling/HostProcesses.swift || {
   echo "process CPU is not one-core scale"
   fail=1
