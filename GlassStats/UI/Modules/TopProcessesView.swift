@@ -7,7 +7,7 @@ struct TopProcessesView: View {
     @State private var pendingQuit: ProcessAttention?
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
+        VStack(alignment: .leading, spacing: 4) {
             Label("Top processes", systemImage: "list.bullet.rectangle")
                 .font(.subheadline.weight(.semibold))
 

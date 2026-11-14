@@ -3,7 +3,11 @@ import SwiftUI
 enum GlassTheme {
     static let panelRadius: CGFloat = 16
     static let popoverWidth: CGFloat = 384
-    static let popoverMaxHeight: CGFloat = 560
+    /// Charts, card padding, and stack gaps are sized so all six modules fit under a
+    /// 13-inch menu bar (about 800pt) with no scroll view.
+    static let chartHeight: CGFloat = 44
+    static let cardPadding: CGFloat = 8
+    static let stackSpacing: CGFloat = 8
 
     /// Dark popover accent. Light surfaces use `cpuTint(_:)`, a deeper cyan that still reads on white.
     static let accent = Color.cyan
@@ -40,7 +44,7 @@ extension View {
     func glassCard(cornerRadius: CGFloat = GlassTheme.panelRadius) -> some View {
         let shape = RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
         return self
-            .padding(12)
+            .padding(GlassTheme.cardPadding)
             .modifier(LiquidGlassBackground(shape: shape))
     }
 
@@ -249,16 +253,16 @@ struct GlassStack<Content: View>: View {
     var body: some View {
         #if compiler(>=6.2) || swift(>=6.2)
         if #available(macOS 26, *) {
-            // Cards are 12pt apart. Container spacing of 14 merges their highlights into one sheet.
-            // Light mode keeps each card's own specular edge. Dark stays at 14.
+            // Cards sit stackSpacing apart. A container spacing above that gap merges highlights.
+            // Light mode keeps each card's own edge. Dark stays at 14.
             GlassEffectContainer(spacing: colorScheme == .light ? 0 : 14) {
-                VStack(alignment: .leading, spacing: 12, content: content)
+                VStack(alignment: .leading, spacing: GlassTheme.stackSpacing, content: content)
             }
         } else {
-            VStack(alignment: .leading, spacing: 12, content: content)
+            VStack(alignment: .leading, spacing: GlassTheme.stackSpacing, content: content)
         }
         #else
-        VStack(alignment: .leading, spacing: 12, content: content)
+        VStack(alignment: .leading, spacing: GlassTheme.stackSpacing, content: content)
         #endif
     }
 }

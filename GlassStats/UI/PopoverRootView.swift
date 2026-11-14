@@ -8,33 +8,30 @@ struct PopoverRootView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
             header
-                .padding(.bottom, 10)
+                .padding(.bottom, 6)
 
-            ScrollView {
-                GlassStack {
-                    if settings.cpuEnabled {
-                        CPUModuleView()
-                    }
-                    if settings.memoryEnabled {
-                        MemoryModuleView()
-                    }
-                    if settings.processesEnabled {
-                        TopProcessesView()
-                    }
-                    if settings.diskEnabled {
-                        DiskModuleView()
-                    }
-                    if settings.networkEnabled {
-                        NetworkModuleView()
-                    }
-                    if settings.batteryEnabled {
-                        BatteryModuleView()
-                    }
+            GlassStack {
+                if settings.cpuEnabled {
+                    CPUModuleView()
+                }
+                if settings.memoryEnabled {
+                    MemoryModuleView()
+                }
+                if settings.processesEnabled {
+                    TopProcessesView()
+                }
+                if settings.diskEnabled {
+                    DiskModuleView()
+                }
+                if settings.networkEnabled {
+                    NetworkModuleView()
+                }
+                if settings.batteryEnabled {
+                    BatteryModuleView()
                 }
             }
-            .frame(maxHeight: GlassTheme.popoverMaxHeight)
         }
-        .padding(14)
+        .padding(10)
         .frame(width: GlassTheme.popoverWidth)
         .glassPopoverChrome()
         .onAppear { store.setPopoverOpen(true) }
@@ -73,7 +70,6 @@ struct PopoverRootView: View {
     return PopoverRootView()
         .environmentObject(settings)
         .environmentObject(store)
-        .frame(height: 640)
 }
 
 #Preview("Light") {
@@ -82,6 +78,5 @@ struct PopoverRootView: View {
     return PopoverRootView()
         .environmentObject(settings)
         .environmentObject(store)
-        .frame(height: 640)
         .preferredColorScheme(.light)
 }

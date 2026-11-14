@@ -9,7 +9,7 @@ struct MemoryModuleView: View {
 
     var body: some View {
         let memory = store.snapshot.memory
-        VStack(alignment: .leading, spacing: 8) {
+        VStack(alignment: .leading, spacing: 6) {
             HStack {
                 Label("Memory", systemImage: "memorychip")
                     .font(.subheadline.weight(.semibold))

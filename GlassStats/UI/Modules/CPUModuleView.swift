@@ -8,7 +8,7 @@ struct CPUModuleView: View {
     private var tint: Color { GlassTheme.cpuTint(colorScheme) }
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
+        VStack(alignment: .leading, spacing: 6) {
             HStack {
                 Label("CPU", systemImage: "cpu")
                     .font(.subheadline.weight(.semibold))
@@ -25,11 +25,11 @@ struct CPUModuleView: View {
                     ForEach(Array(store.snapshot.cpu.cores.enumerated()), id: \.offset) { _, fraction in
                         Capsule()
                             .fill(tint.opacity(colorScheme == .light ? 0.40 + 0.60 * fraction : 0.25 + 0.75 * fraction))
-                            .frame(height: max(3, 18 * fraction))
+                            .frame(height: max(3, 14 * fraction))
                             .frame(maxWidth: .infinity, alignment: .bottom)
                     }
                 }
-                .frame(height: 18)
+                .frame(height: 14)
                 .accessibilityLabel("Per-core load")
             }
 
