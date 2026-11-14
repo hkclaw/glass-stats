@@ -1,4 +1,5 @@
 import Foundation
+import GlassStatsCore
 
 /// Physical RAM accounting from `host_statistics64(HOST_VM_INFO64)` and
 /// `ProcessInfo.physicalMemory` (`hw.memsize`).

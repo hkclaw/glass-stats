@@ -1,3 +1,4 @@
+import GlassStatsCore
 import SwiftUI
 
 struct NetworkModuleView: View {
@@ -11,6 +12,20 @@ struct NetworkModuleView: View {
             HStack {
                 labeledRate(title: "Down", systemImage: "arrow.down", value: network.bytesInPerSecond, ready: network.isReady)
                 labeledRate(title: "Up", systemImage: "arrow.up", value: network.bytesOutPerSecond, ready: network.isReady)
+            }
+            if !store.attention.bursts.isEmpty {
+                VStack(alignment: .leading, spacing: 2) {
+                    ForEach(store.attention.bursts.prefix(6)) { event in
+                        HStack(spacing: 6) {
+                            Text(event.at, format: .dateTime.hour().minute())
+                            Text(event.direction.label)
+                            Text(TextFormat.bytes(event.bytes))
+                            Spacer(minLength: 0)
+                        }
+                        .font(.caption.monospacedDigit())
+                        .glassSecondaryText()
+                    }
+                }
             }
         }
         .frame(maxWidth: .infinity, alignment: .leading)

@@ -1,3 +1,4 @@
+import GlassStatsCore
 import SwiftUI
 
 struct BatteryModuleView: View {
@@ -17,18 +18,26 @@ struct BatteryModuleView: View {
                 Text("No internal battery (desktop or adapter-only).")
                     .font(.caption)
                     .glassSecondaryText()
+            } else if let fraction = battery.fraction {
+                ProgressView(value: fraction)
+                    .tint(battery.isCharging ? .green : .yellow)
+                Text("\(TextFormat.percent(fraction)) · \(statusText(battery))")
+                    .font(.caption)
+                    .glassSecondaryText()
             } else {
-                if let fraction = battery.fraction {
-                    ProgressView(value: fraction)
-                        .tint(battery.isCharging ? .green : .yellow)
-                    Text("\(Formatters.percent(fraction)) · \(statusText(battery))")
-                        .font(.caption)
-                        .glassSecondaryText()
-                } else {
-                    Text(statusText(battery))
-                        .font(.caption)
-                        .glassSecondaryText()
-                }
+                Text(statusText(battery))
+                    .font(.caption)
+                    .glassSecondaryText()
+            }
+            if let drain = store.attention.drain {
+                Text(drain.line)
+                    .font(.caption.monospacedDigit())
+                    .glassSecondaryText()
+            }
+            if let sleep = store.attention.sleepHold {
+                Text(sleep.line)
+                    .font(.caption)
+                    .glassSecondaryText()
             }
         }
         .frame(maxWidth: .infinity, alignment: .leading)

@@ -1,4 +1,5 @@
 import Foundation
+import GlassStatsCore
 
 /// Root volume capacity via Foundation URL resource values (statfs under the hood).
 enum HostDisk {

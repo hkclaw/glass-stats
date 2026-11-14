@@ -1,5 +1,6 @@
 import Darwin
 import Foundation
+import GlassStatsCore
 
 /// Top processes via `proc_listpids` + `proc_pidinfo(PROC_PIDTASKINFO)`.
 /// Names are resolved only for the rows that will be shown.

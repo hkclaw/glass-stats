@@ -1,4 +1,5 @@
 import Foundation
+import GlassStatsCore
 
 /// Coordinates local host samples. Nothing leaves the machine.
 /// Fields omitted from the request keep the previous reading.
@@ -34,8 +35,14 @@ actor SystemSampler {
         return SampleResult(
             snapshot: last,
             processes: lastProcesses,
-            didSampleCPU: request.cpu,
-            didSampleMemory: request.memory
+            sampled: SampledChannels(
+                cpu: request.cpu,
+                memory: request.memory,
+                disk: request.disk,
+                network: request.network,
+                battery: request.battery,
+                processes: request.processes
+            )
         )
     }
 }

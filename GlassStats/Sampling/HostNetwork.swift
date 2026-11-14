@@ -1,5 +1,6 @@
 import Darwin
 import Foundation
+import GlassStatsCore
 
 /// Interface byte counters from `getifaddrs` / `AF_LINK` `if_data`.
 /// Throughput is the delta between samples. 32-bit `ifi_*bytes` wrap is handled.
@@ -20,7 +21,13 @@ struct HostNetwork {
             previousAt = now
         }
         guard let previous, let previousAt else {
-            return NetworkSnapshot(bytesInPerSecond: 0, bytesOutPerSecond: 0, isReady: false)
+            return NetworkSnapshot(
+                bytesInPerSecond: 0,
+                bytesOutPerSecond: 0,
+                bytesInThisSample: 0,
+                bytesOutThisSample: 0,
+                isReady: false
+            )
         }
         let elapsed = now.timeIntervalSince(previousAt)
         guard elapsed > 0 else { return .empty }
@@ -30,6 +37,8 @@ struct HostNetwork {
         return NetworkSnapshot(
             bytesInPerSecond: UInt64((Double(inbound) / elapsed).rounded()),
             bytesOutPerSecond: UInt64((Double(outbound) / elapsed).rounded()),
+            bytesInThisSample: inbound,
+            bytesOutThisSample: outbound,
             isReady: true
         )
     }

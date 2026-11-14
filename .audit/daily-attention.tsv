@@ -1,0 +1,7 @@
+ts	phase	decision	why	evidence	result
+2026-11-14T13:51:03Z	frame	Shipped all ten attention jobs as one board	The menu bar only had two percents, and the popover forgot whatever happened while it was closed	GlassStatsCore/Sources/GlassStatsCore/AttentionBoard.swift	predicate is the Linux test suite plus a Mac build this machine cannot run
+2026-11-14T13:51:03Z	design	Used one AttentionBoard instead of ten separate flags	The menu bar, the event list, and the process row all read one value. Host reads stay outside it	/tmp/arena-attention/candidate-b-first/DESIGN.md	candidate B design, Claude seat rejected by usage limit
+2026-11-14T13:51:03Z	graft	Skip powerd, kernel_task, launchd, WindowServer, and loginwindow when naming the sleep holder	The lowest pid is often powerd, which does not answer who kept the Mac awake	GlassStatsCore/Tests/GlassStatsCoreTests/AttentionBoardTests.swift	testSleepSelectionSkipsPowerdAndKeepsTheLowestApp passed
+2026-11-14T13:51:03Z	verify	Ran scripts/test-attention.sh	17 tests check the headline, the logs, the drain rate, the disk day, and the quit refusal	scripts/test-attention.sh	17 passed, 0 failed
+2026-11-14T13:51:03Z	gap	Did not launch the Mac app	This machine is Linux and has no AppKit or IOKit	n/a	INCONCLUSIVE for the live menu bar
+2026-11-14T13:51:15Z	design	The design sketch stays on the build machine. The contract is the board and the tests	A reviewer cannot open /tmp. The tests are the check that remains	GlassStatsCore/Tests/GlassStatsCoreTests/AttentionBoardTests.swift	supersedes the /tmp evidence row

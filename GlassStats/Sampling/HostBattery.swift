@@ -1,4 +1,5 @@
 import Foundation
+import GlassStatsCore
 import IOKit.ps
 
 /// Internal battery via IOKit power sources (`IOPSCopyPowerSourcesInfo`).

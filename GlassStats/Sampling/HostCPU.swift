@@ -1,4 +1,5 @@
 import Foundation
+import GlassStatsCore
 
 /// System-wide CPU utilization matching Activity Monitor's overall CPU
 /// (user + system + nice) / (user + system + nice + idle), from Mach
