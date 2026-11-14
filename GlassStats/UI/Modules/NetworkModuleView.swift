@@ -5,7 +5,7 @@ struct NetworkModuleView: View {
 
     var body: some View {
         let network = store.snapshot.network
-        VStack(alignment: .leading, spacing: 8) {
+        VStack(alignment: .leading, spacing: 6) {
             Label("Network", systemImage: "arrow.up.arrow.down")
                 .font(.subheadline.weight(.semibold))
             HStack {

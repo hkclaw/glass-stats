@@ -5,7 +5,7 @@ struct DiskModuleView: View {
 
     var body: some View {
         let disk = store.snapshot.disk
-        VStack(alignment: .leading, spacing: 8) {
+        VStack(alignment: .leading, spacing: 6) {
             HStack {
                 Label("Disk", systemImage: "internaldrive")
                     .font(.subheadline.weight(.semibold))

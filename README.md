@@ -19,7 +19,7 @@ Local only. No ads, no tracking, no account.
 ## Why it’s worth opening
 
 - **One glance in the menu bar.** Short percents (`18% · 46%`). VoiceOver still says CPU and memory. No Dock icon.
-- **A popover you can actually read.** Charts for CPU and RAM, per-core bars, and the top processes. Scrolls instead of running off the screen.
+- **A popover you can actually read.** Charts for CPU and RAM, per-core bars, the top processes, and disk, network, and battery. The modules fit on one screen.
 - **Numbers you can compare with Activity Monitor.** CPU is a Mach tick delta, lightly smoothed. Process CPU is one core (about 100% for a full core). Memory used skips the file cache, so an idle Mac does not read as full.
 - **Modules you can turn off.** Hide disk, network, battery, or the process list. Those heavier reads run only while the popover is open.
 - **Stays on the machine.** No analytics SDK and no network client.
