@@ -16,6 +16,7 @@ final class MonitorStore: ObservableObject {
     private var lastSaved: Data
     private var loop: Task<Void, Never>?
     private var folderScan: Task<Void, Never>?
+    private var sampleSequence: UInt64 = 0
     private var settingsTicket: AnyCancellable?
     private let historyLimit = 60
 
@@ -66,25 +67,26 @@ final class MonitorStore: ObservableObject {
             folderScan = nil
         }
         guard changed else { return }
-        attention = board.ingest(AttentionTick.situation(currentSituation(), at: Date()))
+        attention = board.ingest(AttentionTick.situation(currentSituation(), at: Date(), sequence: takeSequence()))
         persistIfNeeded()
         guard isOpen else { return }
         Task { await refresh() }
     }
 
     private func noteSituation() {
-        attention = board.ingest(AttentionTick.situation(currentSituation(), at: Date()))
+        attention = board.ingest(AttentionTick.situation(currentSituation(), at: Date(), sequence: takeSequence()))
         persistIfNeeded()
     }
 
     private func refresh() async {
         let now = Date()
+        let sequence = takeSequence()
         let situation = currentSituation()
         let plan = board.plan(at: now, situation: situation)
         let result = await sampler.sample(plan.request)
         let pressure = plan.readPressure ? HostPressure.read() : nil
         let sleep = plan.readSleepHold ? HostAssertions.userIdleSleepHolder() : nil
-        apply(result: result, plan: plan, situation: situation, at: now, pressure: pressure, sleep: sleep)
+        apply(result: result, plan: plan, situation: situation, at: now, sequence: sequence, pressure: pressure, sleep: sleep)
         guard plan.scanFolders, folderScan == nil else { return }
         folderScan = Task.detached(priority: .utility) { [weak self] in
             let folders = FolderScan.knownHeavyFolders()
@@ -95,7 +97,7 @@ final class MonitorStore: ObservableObject {
     private func deliver(_ folders: [FolderCulprit]) {
         guard !Task.isCancelled else { return }
         folderScan = nil
-        attention = board.ingest(AttentionTick.folders(folders, at: Date(), situation: currentSituation()))
+        attention = board.ingest(AttentionTick.folders(folders, at: Date(), situation: currentSituation(), sequence: takeSequence()))
         persistIfNeeded()
     }
 
@@ -104,6 +106,7 @@ final class MonitorStore: ObservableObject {
         plan: SamplePlan,
         situation: SamplingSituation,
         at: Date,
+        sequence: UInt64,
         pressure: Int?,
         sleep: SleepHold?
     ) {
@@ -117,7 +120,8 @@ final class MonitorStore: ObservableObject {
                 thisAppPid: ProcessInfo.processInfo.processIdentifier,
                 logicalCores: ProcessInfo.processInfo.processorCount,
                 pressureRaw: pressure,
-                sleepHold: sleep
+                sleepHold: sleep,
+                sequence: sequence
             )
         )
         persistIfNeeded()
@@ -150,6 +154,11 @@ final class MonitorStore: ObservableObject {
         guard data != lastSaved else { return }
         lastSaved = data
         saveArchive(data)
+    }
+
+    private func takeSequence() -> UInt64 {
+        sampleSequence += 1
+        return sampleSequence
     }
 
     private func currentSituation() -> SamplingSituation {

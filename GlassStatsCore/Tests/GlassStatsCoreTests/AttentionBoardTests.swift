@@ -309,7 +309,7 @@ final class AttentionBoardTests: XCTestCase {
         XCTAssertTrue(plan.request.processes)
         board.ingest(tick(at: at.addingTimeInterval(3), cpu: 0.50, cores: [0.50], processes: true, rows: []))
         plan = board.plan(at: at.addingTimeInterval(4), situation: situation())
-        XCTAssertFalse(plan.request.processes)
+        XCTAssertTrue(plan.request.processes)
         plan = board.plan(at: at.addingTimeInterval(5), situation: situation())
         XCTAssertTrue(plan.request.processes)
 
@@ -428,6 +428,201 @@ final class AttentionBoardTests: XCTestCase {
         XCTAssertEqual(QuitAction.choose(allowed: true, hasRunningApplication: false, nameStillMatches: true), .signal)
         XCTAssertEqual(QuitAction.choose(allowed: true, hasRunningApplication: true, nameStillMatches: false), .refuse)
         XCTAssertEqual(QuitAction.choose(allowed: false, hasRunningApplication: true, nameStillMatches: true), .refuse)
+        XCTAssertEqual(
+            QuitAction.choose(allowed: true, hasRunningApplication: false, nameStillMatches: true, identityStillMatches: false),
+            .refuse
+        )
+    }
+
+    func testClosedPopoverNamesASpreadOutOwner() {
+        var board = makeBoard()
+        var at = start
+        let cores = Array(repeating: 0.12, count: 8)
+        let row = ProcessRow(pid: 42, name: "Xcode", cpu: 0.90, residentBytes: 20_000_000)
+        for _ in 0..<6 {
+            let plan = board.plan(at: at, situation: situation())
+            board.ingest(tick(
+                at: at,
+                cpu: 0.12,
+                cores: cores,
+                processes: plan.request.processes,
+                rows: plan.request.processes ? [row] : []
+            ))
+            at = at.addingTimeInterval(1)
+        }
+        XCTAssertEqual(board.attention.headline.cpu?.text, "Xcode")
+    }
+
+    func testPeggedCoreStaysOffWhileAProcessOwnsTheLoad() {
+        var board = makeBoard()
+        var at = start
+        let cores = [0.98] + Array(repeating: 0.02, count: 7)
+        let total = cores.reduce(0, +) / Double(cores.count)
+        let row = ProcessRow(pid: 42, name: "Xcode", cpu: 0.98, residentBytes: 1)
+        var seen: [String] = []
+        for _ in 0..<8 {
+            let plan = board.plan(at: at, situation: situation())
+            let attention = board.ingest(tick(
+                at: at,
+                cpu: total,
+                cores: cores,
+                processes: plan.request.processes,
+                rows: plan.request.processes ? [row] : []
+            ))
+            seen.append(attention.headline.cpu?.text ?? "nil")
+            at = at.addingTimeInterval(1)
+        }
+        XCTAssertFalse(seen.contains { $0.contains("c ") })
+        XCTAssertEqual(seen.last, "Xcode")
+    }
+
+    func testNewOwnerDoesNotReplaceTheNameAfterOneSample() {
+        var board = makeBoard()
+        var at = start
+        let cores = Array(repeating: 0.30, count: 8)
+        for _ in 0..<3 {
+            board.ingest(tick(
+                at: at,
+                cpu: 0.30,
+                cores: cores,
+                processes: true,
+                rows: [ProcessRow(pid: 42, name: "Xcode", cpu: 1.5, residentBytes: 1)]
+            ))
+            at = at.addingTimeInterval(1)
+        }
+        let after = board.ingest(tick(
+            at: at,
+            cpu: 0.30,
+            cores: cores,
+            processes: true,
+            rows: [ProcessRow(pid: 77, name: "clang", cpu: 1.5, residentBytes: 1)]
+        ))
+        XCTAssertEqual(after.headline.cpu?.text, "Xcode")
+    }
+
+    func testHiddenPercentsStayHiddenWhileThePopoverIsOpen() {
+        var board = makeBoard()
+        var hiddenCPU = situation(popover: true)
+        hiddenCPU.showCPUInMenuBar = false
+        board.ingest(tick(at: start, cpu: 0.18, cores: [0.18], memory: 0.46, situation: hiddenCPU))
+        XCTAssertNil(board.attention.headline.cpu)
+        XCTAssertEqual(board.attention.headline.memory?.text, "46%")
+
+        var board2 = makeBoard()
+        var hiddenMemory = situation(popover: true)
+        hiddenMemory.showMemoryInMenuBar = false
+        board2.ingest(tick(at: start, cpu: 0.18, cores: [0.18], memory: 0.46, situation: hiddenMemory))
+        XCTAssertEqual(board2.attention.headline.cpu?.text, "18%")
+        XCTAssertNil(board2.attention.headline.memory)
+    }
+
+    func testSpikesRecordWhileMenuBarCPUIsHidden() {
+        var board = makeBoard()
+        var hidden = situation()
+        hidden.showCPUInMenuBar = false
+        var at = start
+        for _ in 0..<4 {
+            let plan = board.plan(at: at, situation: hidden)
+            XCTAssertTrue(plan.request.cpu)
+            board.ingest(tick(at: at, cpu: 0.97, cores: [0.97], situation: hidden))
+            at = at.addingTimeInterval(1)
+        }
+        XCTAssertNil(board.attention.headline.cpu)
+        XCTAssertGreaterThan(board.attention.spikes.count, 0)
+    }
+
+    func testClockStepBackStillUpdates() {
+        var board = makeBoard()
+        let later = start.addingTimeInterval(3600)
+        board.ingest(tick(at: later, cpu: 0.18, cores: [0.18], sequence: 1))
+        var at = start
+        for index in 2...5 {
+            board.ingest(tick(at: at, cpu: 0.72, cores: [0.72], sequence: UInt64(index)))
+            at = at.addingTimeInterval(1)
+        }
+        XCTAssertEqual(board.attention.headline.cpu?.text, "72%")
+        XCTAssertEqual(board.attention.spikes.count, 1)
+    }
+
+    func testResidentGrowthSurvivesABurstOfCompilerPids() {
+        var board = makeBoard()
+        var at = start
+        board.ingest(tick(
+            at: at,
+            cpu: 0.2,
+            cores: [0.2],
+            processes: true,
+            rows: [ProcessRow(pid: 7, name: "Safari", cpu: 0.2, residentBytes: 500 * 1024 * 1024)]
+        ))
+        for index in 0..<400 {
+            at = at.addingTimeInterval(1)
+            let row = ProcessRow(pid: Int32(1000 + index), name: "clang", cpu: 0.4, residentBytes: 1024)
+            board.ingest(tick(at: at, cpu: 0.2, cores: [0.2], processes: true, rows: [row]))
+        }
+        at = at.addingTimeInterval(1)
+        board.ingest(tick(
+            at: at,
+            cpu: 0.2,
+            cores: [0.2],
+            processes: true,
+            rows: [ProcessRow(pid: 7, name: "Safari", cpu: 0.2, residentBytes: 600 * 1024 * 1024)]
+        ))
+        XCTAssertEqual(board.attention.rows[0].sinceOpenLabel, "+100 MB since open")
+    }
+
+    func testDisplayedTwoGigabytesReplacesTheMemoryPercent() {
+        var board = makeBoard()
+        let dayOne = start.addingTimeInterval(12 * 3600)
+        let dayTwo = dayOne.addingTimeInterval(24 * 3600)
+        let yesterday = 100 * gib
+        let drop = UInt64(2_100_000_000)
+        board.ingest(diskTick(at: dayOne, available: yesterday, memory: 0.46))
+        var at = dayTwo
+        for _ in 0..<3 {
+            board.ingest(diskTick(at: at, available: yesterday - drop, memory: 0.46))
+            at = at.addingTimeInterval(1)
+        }
+        XCTAssertEqual(board.attention.diskDrop?.detail, "2.0 GB less free than yesterday")
+        XCTAssertEqual(board.attention.headline.memory?.text, "-2.0GB")
+    }
+
+    func testDiskTokenClearsWhenTheLocalDayChanges() {
+        var board = makeBoard()
+        let dayOne = start.addingTimeInterval(12 * 3600)
+        let dayTwo = dayOne.addingTimeInterval(24 * 3600)
+        board.ingest(diskTick(at: dayOne, available: 100 * gib, memory: 0.46))
+        var at = dayTwo
+        for _ in 0..<3 {
+            board.ingest(diskTick(at: at, available: 97 * gib, memory: 0.46))
+            at = at.addingTimeInterval(1)
+        }
+        XCTAssertEqual(board.attention.headline.memory?.text, "-3.0GB")
+        let nextDay = dayTwo.addingTimeInterval(12 * 3600 + 30)
+        board.ingest(tick(at: nextDay, cpu: 0.10, cores: [0.10], memory: 0.46))
+        XCTAssertNil(board.attention.diskDrop)
+        XCTAssertEqual(board.attention.headline.memory?.text, "46%")
+    }
+
+    func testInterfaceLedgerKeepsOneInterfaceWhenAnotherReturns() {
+        var ledger = InterfaceLedger()
+        let en0 = InterfaceCounter(name: "en0", inbound: 0, outbound: 0)
+        let awdl = InterfaceCounter(name: "awdl0", inbound: 300 * 1024 * 1024, outbound: 40 * 1024 * 1024)
+        _ = ledger.consume([en0, awdl])
+        let moved = ledger.consume([
+            InterfaceCounter(name: "en0", inbound: 25 * 1024 * 1024, outbound: 0),
+            awdl
+        ])
+        XCTAssertEqual(moved.inbound, 25 * 1024 * 1024)
+        let down = ledger.consume([
+            InterfaceCounter(name: "en0", inbound: 50 * 1024 * 1024, outbound: 0)
+        ])
+        XCTAssertEqual(down.inbound, 25 * 1024 * 1024)
+        let back = ledger.consume([
+            InterfaceCounter(name: "en0", inbound: 50 * 1024 * 1024 + 200_000, outbound: 0),
+            awdl
+        ])
+        XCTAssertEqual(back.inbound, 200_000)
+        XCTAssertEqual(back.outbound, 0)
     }
 
     func testTextFormatIsStable() {
@@ -480,7 +675,9 @@ final class AttentionBoardTests: XCTestCase {
         outbound: UInt64 = 0,
         inRate: UInt64 = 0,
         outRate: UInt64 = 0,
-        network: Bool = false
+        network: Bool = false,
+        situation: SamplingSituation? = nil,
+        sequence: UInt64 = 0
     ) -> AttentionTick {
         let memoryReady = memory != nil
         let snapshot = SystemSnapshot(
@@ -513,7 +710,7 @@ final class AttentionBoardTests: XCTestCase {
             battery: false,
             processes: processes
         )
-        let current = situation()
+        let current = situation ?? self.situation()
         let plan = SamplePlan(
             request: SampleRequest(cpu: true, memory: memoryReady, disk: false, network: sampled.network, battery: false, processes: processes),
             readPressure: includePressure || pressure != nil,
@@ -528,7 +725,8 @@ final class AttentionBoardTests: XCTestCase {
             thisAppPid: 99,
             logicalCores: max(cores.count, 1),
             pressureRaw: pressure,
-            sleepHold: nil
+            sleepHold: nil,
+            sequence: sequence
         )
     }
 

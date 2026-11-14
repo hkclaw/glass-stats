@@ -206,11 +206,14 @@ public struct ProcessRow: Identifiable, Equatable {
     public var cpu: Double
     public var residentBytes: UInt64
 
-    public init(pid: Int32, name: String, cpu: Double, residentBytes: UInt64) {
+    public var startToken: UInt64
+
+    public init(pid: Int32, name: String, cpu: Double, residentBytes: UInt64, startToken: UInt64 = 0) {
         self.pid = pid
         self.name = name
         self.cpu = cpu
         self.residentBytes = residentBytes
+        self.startToken = startToken
     }
 }
 

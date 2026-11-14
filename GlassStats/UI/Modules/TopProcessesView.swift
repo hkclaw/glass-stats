@@ -60,7 +60,7 @@ struct TopProcessesView: View {
         ) {
             Button("Quit", role: .destructive) {
                 if let item = pendingQuit {
-                    ProcessCommands.quit(pid: item.row.pid, name: item.row.name)
+                    ProcessCommands.quit(pid: item.row.pid, name: item.row.name, startToken: item.row.startToken)
                 }
             }
             Button("Cancel", role: .cancel) {}

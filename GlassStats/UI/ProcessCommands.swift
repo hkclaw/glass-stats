@@ -21,14 +21,16 @@ enum ProcessCommands {
         NSWorkspace.shared.activateFileViewerSelecting([URL(fileURLWithPath: String(cString: path))])
     }
 
-    static func quit(pid: Int32, name: String) {
+    static func quit(pid: Int32, name: String, startToken: UInt64) {
         let app = NSRunningApplication(processIdentifier: pid)
         let procMatches = currentName(pid).caseInsensitiveCompare(name) == .orderedSame
         let localizedMatches = app?.localizedName?.caseInsensitiveCompare(name) == .orderedSame
+        let identity = startToken != 0 && currentStartToken(pid) == startToken
         switch QuitAction.choose(
             allowed: allows(pid: pid, name: name),
             hasRunningApplication: app != nil,
-            nameStillMatches: procMatches || localizedMatches
+            nameStillMatches: procMatches || localizedMatches,
+            identityStillMatches: identity
         ) {
         case .terminate:
             app?.terminate()
@@ -37,6 +39,16 @@ enum ProcessCommands {
         case .refuse:
             break
         }
+    }
+
+    private static func currentStartToken(_ pid: Int32) -> UInt64 {
+        var info = proc_bsdinfo()
+        let size = Int32(MemoryLayout<proc_bsdinfo>.stride)
+        let result = withUnsafeMutablePointer(to: &info) { pointer in
+            proc_pidinfo(pid, PROC_PIDTBSDINFO, 0, pointer, size)
+        }
+        guard result == size else { return 0 }
+        return info.pbi_start_tvsec &* 1_000_000 &+ info.pbi_start_tvusec
     }
 
     private static func currentName(_ pid: Int32) -> String {

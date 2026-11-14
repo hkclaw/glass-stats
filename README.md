@@ -59,7 +59,7 @@ Sampling defaults to **1 second** (Settings: 1 / 2 / 5 s). Optional regenerate: 
 | --- | --- | --- |
 | CPU | Live | `host_statistics(HOST_CPU_LOAD_INFO)` for the total, `host_processor_info` for each core. Busy time is the delta of user + system + nice over all ticks. The menu bar total is lightly smoothed. |
 | Memory | Live | `host_statistics64(HOST_VM_INFO64)` and `hw.memsize`. Used ≈ app (internal − purgeable) + wired + compressed. File cache is excluded. |
-| Top processes | Live | `proc_listpids` and `proc_pidinfo`. Names are resolved for the top 8. CPU is one core, like Activity Monitor, capped at the logical CPU count. While the popover is closed, this runs only when the CPU is busy, and at most every 2 seconds. A row can copy a sample, reveal the app, or quit it. |
+| Top processes | Live | `proc_listpids` and `proc_pidinfo`. Names are resolved for the top 8. CPU is one core, like Activity Monitor, capped at the logical CPU count. While the popover is closed, this runs when one process could own the CPU. A row can copy a sample, reveal the app, or quit it. |
 | Disk | Basic | Boot volume capacity from URL resource values, at least every 5 minutes. Free space is compared with the previous local day. A drop of 2 GB or more can list DerivedData, Caches, Docker, and CoreSimulator while the popover is open. |
 | Network | Basic | `getifaddrs` byte counters, shown per second, while the module is on. A large burst is kept for a day. |
 | Battery | Basic | IOKit power sources, at least every 30 seconds. On battery, the popover shows a drain rate after a few minutes. Opening the popover also names a process holding idle sleep, when one is. |

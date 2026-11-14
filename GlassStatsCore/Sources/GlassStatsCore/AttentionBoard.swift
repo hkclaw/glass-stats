@@ -110,9 +110,51 @@ public enum QuitAction: Equatable {
     case signal
     case refuse
 
-    public static func choose(allowed: Bool, hasRunningApplication: Bool, nameStillMatches: Bool) -> QuitAction {
-        guard allowed, nameStillMatches else { return .refuse }
+    public static func choose(
+        allowed: Bool,
+        hasRunningApplication: Bool,
+        nameStillMatches: Bool,
+        identityStillMatches: Bool = true
+    ) -> QuitAction {
+        guard allowed, nameStillMatches, identityStillMatches else { return .refuse }
         return hasRunningApplication ? .terminate : .signal
+    }
+}
+
+public struct InterfaceCounter: Equatable {
+    public var name: String
+    public var inbound: UInt64
+    public var outbound: UInt64
+
+    public init(name: String, inbound: UInt64, outbound: UInt64) {
+        self.name = name
+        self.inbound = inbound
+        self.outbound = outbound
+    }
+}
+
+public struct InterfaceLedger {
+    private var previous: [String: InterfaceCounter] = [:]
+    private var primed = false
+
+    public init() {}
+
+    /// Per-interface deltas. A new or returning interface contributes nothing until the next sample.
+    /// An interface that disappeared contributes nothing, and does not cancel the others.
+    public mutating func consume(_ current: [InterfaceCounter]) -> (inbound: UInt64, outbound: UInt64, ready: Bool) {
+        var inbound: UInt64 = 0
+        var outbound: UInt64 = 0
+        if primed {
+            for item in current {
+                guard let prior = previous[item.name] else { continue }
+                inbound += CounterDelta.bytes(current: item.inbound, previous: prior.inbound)
+                outbound += CounterDelta.bytes(current: item.outbound, previous: prior.outbound)
+            }
+        }
+        previous = Dictionary(uniqueKeysWithValues: current.map { ($0.name, $0) })
+        let ready = primed
+        primed = true
+        return (inbound, outbound, ready)
     }
 }
 
@@ -390,6 +432,7 @@ public struct AttentionTick {
 
     var at: Date
     var situation: SamplingSituation
+    var sequence: UInt64
     var kind: Kind
 
     public static func sample(
@@ -400,11 +443,13 @@ public struct AttentionTick {
         thisAppPid: Int32,
         logicalCores: Int,
         pressureRaw: Int?,
-        sleepHold: SleepHold?
+        sleepHold: SleepHold?,
+        sequence: UInt64 = 0
     ) -> AttentionTick {
         AttentionTick(
             at: at,
             situation: situation,
+            sequence: sequence,
             kind: .sample(
                 SamplePayload(
                     result: result,
@@ -418,16 +463,17 @@ public struct AttentionTick {
         )
     }
 
-    public static func situation(_ situation: SamplingSituation, at: Date) -> AttentionTick {
-        AttentionTick(at: at, situation: situation, kind: .situation)
+    public static func situation(_ situation: SamplingSituation, at: Date, sequence: UInt64 = 0) -> AttentionTick {
+        AttentionTick(at: at, situation: situation, sequence: sequence, kind: .situation)
     }
 
     public static func folders(
         _ folders: [FolderCulprit],
         at: Date,
-        situation: SamplingSituation
+        situation: SamplingSituation,
+        sequence: UInt64 = 0
     ) -> AttentionTick {
-        AttentionTick(at: at, situation: situation, kind: .folders(folders))
+        AttentionTick(at: at, situation: situation, sequence: sequence, kind: .folders(folders))
     }
 }
 
@@ -458,6 +504,8 @@ public struct AttentionBoard {
     private var calendar: Calendar
     private var lastTickAt: Date
     private var lastAppliedAt: Date
+    private var lastAppliedSequence: UInt64 = 0
+    private var ownerPid: Int32?
     private var headline: MenuHeadline
     private var published: Attention
 
@@ -495,7 +543,12 @@ public struct AttentionBoard {
     }
 
     public mutating func ingest(_ tick: AttentionTick) -> Attention {
-        guard tick.at >= lastAppliedAt else { return published }
+        if tick.sequence > 0 {
+            guard tick.sequence >= lastAppliedSequence else { return published }
+            lastAppliedSequence = tick.sequence
+        } else {
+            guard tick.at >= lastAppliedAt else { return published }
+        }
         lastAppliedAt = tick.at
         situation = tick.situation
         lastTickAt = tick.at
@@ -514,28 +567,24 @@ public struct AttentionBoard {
     }
 
     public func plan(at: Date, situation: SamplingSituation) -> SamplePlan {
-        let cpu = cpuWanted(situation)
-        let memory = memoryWanted(situation)
         let battery = situation.batteryEnabled && (situation.popoverOpen || markMissingOrOlderThan(.battery, seconds: 30, at: at))
         let disk = situation.diskEnabled && (situation.popoverOpen || markMissingOrOlderThan(.disk, seconds: 300, at: at))
-        let processes = situation.processesEnabled && (
-            situation.popoverOpen || (machineIsHot && markMissingOrOlderThan(.processes, seconds: 2, at: at))
-        )
+        let processes = situation.processesEnabled && (situation.popoverOpen || ownerCouldExist)
         let dropBytes = daybook.drop(asOf: at, calendar: calendar) ?? 0
         return SamplePlan(
             request: SampleRequest(
-                cpu: cpu,
-                memory: memory,
+                cpu: samplesCPU(situation),
+                memory: samplesMemory(situation),
                 disk: disk,
                 network: situation.networkEnabled,
                 battery: battery,
                 processes: processes
             ),
-            readPressure: memory,
+            readPressure: samplesMemory(situation),
             readSleepHold: situation.popoverOpen,
             scanFolders: situation.popoverOpen
                 && situation.diskEnabled
-                && dropBytes >= Self.twoGiB
+                && Self.countsAsTwoGB(dropBytes)
                 && !scanSatisfied
         )
     }
@@ -552,14 +601,20 @@ public struct AttentionBoard {
             lastCPU = result.snapshot.cpu
             let cpu = result.snapshot.cpu
             if cpu.isReady {
-                if result.sampled.processes {
-                    let owner = ownerToken(cpu: cpu, processes: result.processes, logicalCores: payload.logicalCores)
-                    cpuSlot.first.advance(qualifies: owner != nil, fresh: owner)
-                } else if !isHot(cpu) {
-                    cpuSlot.first.advance(qualifies: false, fresh: nil)
-                }
                 let pegged = peggedToken(cpu)
-                cpuSlot.second.advance(qualifies: pegged != nil, fresh: pegged)
+                let waitingToNameOwner = situation.processesEnabled && ownerPossible(cpu) && !result.sampled.processes
+                if result.sampled.processes {
+                    advanceOwner(cpu: cpu, processes: result.processes, logicalCores: payload.logicalCores)
+                    cpuSlot.second.advance(qualifies: pegged != nil, fresh: pegged)
+                } else if waitingToNameOwner {
+                    // A process may own this load. Wait for that sample before posting a pegged core.
+                } else {
+                    if !ownerPossible(cpu) {
+                        ownerPid = nil
+                        cpuSlot.first.advance(qualifies: false, fresh: nil)
+                    }
+                    cpuSlot.second.advance(qualifies: pegged != nil, fresh: pegged)
+                }
                 let hit = cpu.total >= 0.60 || (cpu.cores.max() ?? 0) >= 0.95
                 if spikeLatch.observe(hit: hit, at: at) {
                     let top = result.sampled.processes ? result.processes.first : nil
@@ -595,7 +650,7 @@ public struct AttentionBoard {
             if result.snapshot.disk.isReady {
                 daybook.record(available: result.snapshot.disk.availableBytes, at: at, calendar: calendar)
                 refreshDiskPresentation()
-                let qualifies = (diskDrop?.bytes ?? 0) >= Self.twoGiB
+                let qualifies = Self.countsAsTwoGB(diskDrop?.bytes ?? 0)
                 let fresh = qualifies ? diskMenuToken(diskDrop?.bytes ?? 0) : nil
                 memorySlot.second.advance(qualifies: qualifies, fresh: fresh)
             }
@@ -636,7 +691,7 @@ public struct AttentionBoard {
     private mutating func applyFolders(_ folders: [FolderCulprit], at: Date) {
         guard claim(.folders, at: at) else { return }
         let drop = daybook.drop(asOf: at, calendar: calendar) ?? 0
-        guard situation.popoverOpen, drop >= Self.twoGiB else { return }
+        guard situation.popoverOpen, Self.countsAsTwoGB(drop) else { return }
         culprits = folders.sorted { $0.bytes > $1.bytes }
         scanSatisfied = true
     }
@@ -670,14 +725,16 @@ public struct AttentionBoard {
     }
 
     private mutating func applyVisibility() {
-        if !cpuWanted(situation) {
+        if !showsCPU(situation) {
             cpuSlot = NoticeSlot()
+            ownerPid = nil
         }
         if !situation.processesEnabled {
             cpuSlot.first = Candidate()
+            ownerPid = nil
             rows = []
         }
-        if !memoryWanted(situation) {
+        if !showsMemory(situation) {
             memorySlot.first = Candidate()
         }
         if !situation.diskEnabled {
@@ -689,6 +746,9 @@ public struct AttentionBoard {
             sleepHold = nil
         }
         refreshDiskPresentation()
+        if !daybook.holds(lastTickAt, calendar: calendar), memorySlot.second.latch.isShowing {
+            memorySlot.second = Candidate()
+        }
         publishTokens()
     }
 
@@ -700,13 +760,13 @@ public struct AttentionBoard {
         diskDrop = DiskDrop(
             bytes: drop,
             detail: "\(TextFormat.bytes(drop)) less free than yesterday",
-            waitingForCulprits: situation.popoverOpen && drop >= Self.twoGiB && !scanSatisfied
+            waitingForCulprits: situation.popoverOpen && Self.countsAsTwoGB(drop) && !scanSatisfied
         )
     }
 
     private mutating func publishTokens() {
         let cpuToken: MenuToken?
-        if !cpuWanted(situation) {
+        if !showsCPU(situation) {
             cpuToken = nil
         } else if let cpu = lastCPU, cpu.isReady {
             cpuToken = cpuSlot.resolve(
@@ -720,7 +780,7 @@ public struct AttentionBoard {
         }
 
         let memoryToken: MenuToken?
-        if !memoryWanted(situation) {
+        if !showsMemory(situation) {
             memoryToken = nil
         } else if lastMemoryReady || memorySlot.first.latch.isShowing || memorySlot.second.latch.isShowing {
             let quiet = lastMemoryReady
@@ -780,7 +840,7 @@ public struct AttentionBoard {
     }
 
     private mutating func trimBaselines(keeping current: Set<BaselineKey>) {
-        while baselines.count > 300 {
+        while baselines.count > 8_192 {
             guard let victim = baselines
                 .filter({ !current.contains($0.key) })
                 .min(by: { $0.value.seenAt < $1.value.seenAt })?
@@ -813,21 +873,32 @@ public struct AttentionBoard {
         return at.timeIntervalSince(mark) >= seconds
     }
 
-    private var machineIsHot: Bool {
+    private var ownerCouldExist: Bool {
         guard let lastCPU else { return false }
-        return isHot(lastCPU)
+        return ownerPossible(lastCPU)
     }
 
-    private func isHot(_ cpu: CPUSnapshot) -> Bool {
-        cpu.isReady && (cpu.total >= 0.25 || (cpu.cores.max() ?? 0) >= 0.80)
+    private func ownerPossible(_ cpu: CPUSnapshot) -> Bool {
+        guard cpu.isReady else { return false }
+        let cores = max(cpu.cores.count, 1)
+        let busy = cpu.total * Double(cores)
+        return busy >= 0.5 || (cpu.cores.max() ?? 0) >= 0.80
     }
 
-    private func cpuWanted(_ situation: SamplingSituation) -> Bool {
-        situation.showCPUInMenuBar || (situation.popoverOpen && situation.cpuEnabled)
+    private func showsCPU(_ situation: SamplingSituation) -> Bool {
+        situation.showCPUInMenuBar
     }
 
-    private func memoryWanted(_ situation: SamplingSituation) -> Bool {
-        situation.showMemoryInMenuBar || (situation.popoverOpen && situation.memoryEnabled)
+    private func showsMemory(_ situation: SamplingSituation) -> Bool {
+        situation.showMemoryInMenuBar
+    }
+
+    private func samplesCPU(_ situation: SamplingSituation) -> Bool {
+        situation.showCPUInMenuBar || situation.cpuEnabled
+    }
+
+    private func samplesMemory(_ situation: SamplingSituation) -> Bool {
+        situation.showMemoryInMenuBar || situation.memoryEnabled
     }
 
     private func coreCount(cpu: CPUSnapshot, logicalCores: Int) -> Int {
@@ -835,14 +906,31 @@ public struct AttentionBoard {
         return max(logicalCores, 1)
     }
 
-    private func ownerToken(cpu: CPUSnapshot, processes: [ProcessRow], logicalCores: Int) -> MenuToken? {
+    private mutating func advanceOwner(cpu: CPUSnapshot, processes: [ProcessRow], logicalCores: Int) {
+        guard let owner = qualifyingOwner(cpu: cpu, processes: processes, logicalCores: logicalCores) else {
+            ownerPid = nil
+            cpuSlot.first.advance(qualifies: false, fresh: nil)
+            return
+        }
+        let token = MenuToken(text: menuName(owner.name), accessibility: "CPU owned by \(owner.name)")
+        if ownerPid == owner.pid || !cpuSlot.first.latch.isShowing {
+            ownerPid = owner.pid
+            cpuSlot.first.advance(qualifies: true, fresh: token)
+            return
+        }
+        cpuSlot.first.advance(qualifies: false, fresh: nil)
+        if !cpuSlot.first.latch.isShowing {
+            ownerPid = owner.pid
+            cpuSlot.first.advance(qualifies: true, fresh: token)
+        }
+    }
+
+    private func qualifyingOwner(cpu: CPUSnapshot, processes: [ProcessRow], logicalCores: Int) -> ProcessRow? {
         let busy = cpu.total * Double(coreCount(cpu: cpu, logicalCores: logicalCores))
         guard busy >= 0.5 else { return nil }
-        guard let owner = processes
-            .filter({ $0.cpu >= 0.70 && $0.cpu >= 0.5 * busy })
+        return processes
+            .filter { $0.cpu >= 0.70 && $0.cpu >= 0.5 * busy }
             .max(by: { $0.cpu < $1.cpu })
-        else { return nil }
-        return MenuToken(text: menuName(owner.name), accessibility: "CPU owned by \(owner.name)")
     }
 
     private func peggedToken(_ cpu: CPUSnapshot) -> MenuToken? {
@@ -879,7 +967,11 @@ public struct AttentionBoard {
         return String(name.prefix(15)) + "…"
     }
 
-    private static let twoGiB: UInt64 = 2 * 1024 * 1024 * 1024
+    private static func countsAsTwoGB(_ bytes: UInt64) -> Bool {
+        let gib = Double(bytes) / 1_073_741_824
+        return (gib * 10).rounded() / 10 >= 2
+    }
+
     private static let twentyMiB: UInt64 = 20 * 1024 * 1024
     private static let eightMiB: UInt64 = 8 * 1024 * 1024
     private static let fiveMiB: UInt64 = 5 * 1024 * 1024
@@ -1028,6 +1120,11 @@ private struct DiskDaybook: Codable {
     var todayAvailable: UInt64?
     var yesterday: LocalDay?
     var yesterdayAvailable: UInt64?
+
+    func holds(_ date: Date, calendar: Calendar) -> Bool {
+        guard let today else { return false }
+        return today == LocalDay.from(date, calendar: calendar)
+    }
 
     func drop(asOf: Date, calendar: Calendar) -> UInt64? {
         let day = LocalDay.from(asOf, calendar: calendar)
